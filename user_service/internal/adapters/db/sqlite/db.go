@@ -1,19 +1,30 @@
 package sqlite
 
 import (
-	"database/sql"
+	"context"
+	"fmt"
 	"log"
 	"time"
 
+	"github.com/jmoiron/sqlx"
+	_ "github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/rcarvalho-pb/mottu-user_service/internal/domain/model"
 )
 
+// GetUserById(int64) (*User, error)
+// GetUserByUsername(string) ([]*User, error)
+// CreateUser(User) error
+// UpdateUser(User) error
+
+var dbTimeout = 10 * time.Second
+
 type DB struct {
-	DB *sql.DB
+	DB *sqlx.DB
 }
 
 func GetDB() *DB {
-	db := ConnectToDB()
+	db := connectToDB()
 	if db == nil {
 		log.Fatal("couldn't connect to DB")
 	}
@@ -21,10 +32,10 @@ func GetDB() *DB {
 	return &DB{db}
 }
 
-func ConnectToDB() *sql.DB {
+func connectToDB() *sqlx.DB {
 	count := 0
 	for count < 10 {
-		db, err := OpenDB()
+		db, err := openDB()
 		if err == nil {
 			return db
 		}
@@ -36,8 +47,8 @@ func ConnectToDB() *sql.DB {
 	return nil
 }
 
-func OpenDB() (*sql.DB, error) {
-	conn, err := sql.Open("sqlite3", "../data-storage/db.db")
+func openDB() (*sqlx.DB, error) {
+	conn, err := sqlx.Open("sqlite3", "../data-storage/db.db")
 	if err != nil {
 		return nil, err
 	}
@@ -46,4 +57,94 @@ func OpenDB() (*sql.DB, error) {
 	}
 
 	return conn, nil
+}
+
+func (db *DB) GetUserById(userId int64) (*model.User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	stmt := `SELECT * FROM tb_users WHERE id = ?`
+
+	row := db.DB.QueryRowContext(ctx, stmt, userId)
+
+	var user model.User
+	if err := row.Scan(
+		&user.ID,
+		&user.Username,
+		&user.Password,
+		&user.Name,
+		&user.BirthDate,
+		&user.CNPJ,
+		&user.CNH,
+		&user.CNHType,
+		&user.CNHFilePath,
+		&user.ActiveLocation,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+		&user.Active,
+	); err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+func (db *DB) GetUserByUsername(username string) ([]*model.User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	stmt := `SELECT * FROM tb_users WHERE username LIKE %?%`
+
+	rows, err := db.DB.QueryContext(ctx, stmt, username)
+	if err != nil {
+		return nil, err
+	}
+
+	var users []*model.User
+
+	for rows.Next() {
+		var user model.User
+
+		if err = rows.Scan(
+			&user.ID,
+			&user.Username,
+			&user.Password,
+			&user.Name,
+			&user.BirthDate,
+			&user.CNPJ,
+			&user.CNH,
+			&user.CNHType,
+			&user.CNHFilePath,
+			&user.ActiveLocation,
+			&user.CreatedAt,
+			&user.UpdatedAt,
+			&user.Active,
+		); err != nil {
+			return nil, err
+		}
+
+		users = append(users, &user)
+	}
+
+	return users, err
+}
+
+func (db *DB) CreateUser(user *model.User) error {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	stmt := `INSERT INTO tb_users (username, password, name, birth_date, cnpj, cnh, cnh_type) VALUES (:username, :password, :name, :birth_date, :cnpj, :cnh, :cnh_type)`
+
+	res, err := db.DB.NamedExecContext(ctx, stmt, user)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(res)
+
+	return nil
+}
+
+func (db *DB) UpdateUser(user *model.User) error {
+	return nil
 }

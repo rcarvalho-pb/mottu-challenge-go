@@ -3,9 +3,11 @@ package services
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/rcarvalho-pb/mottu-user_service/internal/application/dtos"
 	"github.com/rcarvalho-pb/mottu-user_service/internal/domain/model"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserService struct {
@@ -52,7 +54,14 @@ func (us *UserService) NewUser(newUser dtos.UserDTO) error {
 
 	user := model.UserFromDTO(newUser)
 
-	if err := us.UserRepository.CreateUser(*user); err != nil {
+	hashedPassowrd, err := hashPassword(user.Password)
+	if err != nil {
+		return err
+	}
+
+	user.Password = string(hashedPassowrd)
+
+	if err := us.UserRepository.CreateUser(user); err != nil {
 		return err
 	}
 
@@ -97,7 +106,13 @@ func (us *UserService) UpdateUser(userId int64, newUser *dtos.UserDTO) error {
 		user.CNHFilePath = newUser.CNHFilePath
 	}
 
-	if err = us.UserRepository.UpdateUser(*user); err != nil {
+	if user.ActiveLocation != newUser.ActiveLocation {
+		user.ActiveLocation = newUser.ActiveLocation
+	}
+
+	user.UpdatedAt = time.Now()
+
+	if err = us.UserRepository.UpdateUser(user); err != nil {
 		return err
 	}
 
@@ -111,12 +126,27 @@ func (us *UserService) DeactivateUserById(userId int64) error {
 	}
 
 	user.Active = false
-	if err = us.UserRepository.UpdateUser(*user); err != nil {
+	user.UpdatedAt = time.Now()
+	if err = us.UserRepository.UpdateUser(user); err != nil {
 		return err
 	}
 
 	return nil
+}
 
+func (us *UserService) ReactivateUserById(userId int64) error {
+	user, err := us.UserRepository.GetUserById(userId)
+	if err != nil {
+		return err
+	}
+
+	user.Active = true
+	user.UpdatedAt = time.Now()
+	if err = us.UserRepository.UpdateUser(user); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func parameterizaNewUser(newUser *dtos.UserDTO) error {
@@ -154,4 +184,8 @@ func validateNewUser(user dtos.UserDTO) error {
 		return fmt.Errorf("User cnh type can't be empty")
 	}
 	return nil
+}
+
+func hashPassword(password string) ([]byte, error) {
+	return bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 }

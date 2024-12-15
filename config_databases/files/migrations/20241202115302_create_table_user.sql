@@ -13,9 +13,9 @@ CREATE TABLE IF NOT EXISTS tb_users (
     active_location BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    active BOOLEAN DEFAULT TRUE,
     CONSTRAINT unique_user_cnpj UNIQUE (cnpj),
-    CONSTRAINT unique_user_cnh UNIQUE (cnh),
-    active BOOLEAN DEFAULT TRUE
+    CONSTRAINT unique_user_cnh UNIQUE (cnh)
     );
 -- +goose StatementEnd
 
