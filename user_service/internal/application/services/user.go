@@ -43,12 +43,12 @@ func (us *UserService) GetUsersByUsername(username string) ([]*dtos.UserDTO, err
 	return usersDto, nil
 }
 
-func (us *UserService) NewUser(newUser dtos.UserDTO) error {
-	if err := validateNewUser(newUser); err != nil {
+func (us *UserService) NewUser(newUser *dtos.UserDTO) error {
+	if err := validateNewUser(*newUser); err != nil {
 		return err
 	}
 
-	if err := parameterizaNewUser(&newUser); err != nil {
+	if err := parameterizaNewUser(newUser); err != nil {
 		return err
 	}
 

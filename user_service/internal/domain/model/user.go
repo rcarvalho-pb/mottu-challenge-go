@@ -29,10 +29,30 @@ type User struct {
 	Active         bool      `json:"active" db:"active"`
 }
 
-func UserFromDTO(dto dtos.UserDTO) *User {
-	return &User{}
+func UserFromDTO(dto *dtos.UserDTO) *User {
+	return &User{
+		Username:       dto.Username,
+		Password:       dto.Password,
+		Name:           dto.Username,
+		BirthDate:      dto.BirthDate,
+		CNPJ:           dto.CNPJ,
+		CNH:            dto.CNH,
+		CNHType:        dto.CNHType,
+		CNHFilePath:    dto.CNHFilePath,
+		ActiveLocation: dto.ActiveLocation,
+	}
 }
 
 func (u *User) ToDTO() *dtos.UserDTO {
-	return &dtos.UserDTO{}
+	return &dtos.UserDTO{
+		Username:       u.Username,
+		Password:       u.Password,
+		Name:           u.Name,
+		BirthDate:      u.BirthDate,
+		CNPJ:           u.CNPJ,
+		CNH:            u.CNH,
+		CNHType:        u.CNHType,
+		CNHFilePath:    u.CNHFilePath,
+		ActiveLocation: u.ActiveLocation,
+	}
 }

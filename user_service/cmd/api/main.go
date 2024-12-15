@@ -13,24 +13,26 @@ func main() {
 	db := sqlite.GetDB()
 	userService := services.NewUserService(db)
 	user := model.User{
-		Username:       "rcarvalho",
-		Password:       "123",
-		Name:           "Ramon",
-		BirthDate:      time.Time{},
-		CNPJ:           "123123123",
-		CNH:            "123123123123",
-		CNHType:        "B",
-		ActiveLocation: false,
-		CreatedAt:      time.Time{},
-		UpdatedAt:      time.Time{},
-		Active:         true,
+		Username:    "rcarvalho",
+		Password:    "123",
+		Name:        "Ramon223",
+		BirthDate:   time.Now(),
+		CNPJ:        "123123122232",
+		CNH:         "123123131232123212",
+		CNHType:     "B",
+		CNHFilePath: "TESTE",
 	}
 
-	if err := userService.UserRepository.CreateUser(&user); err != nil {
+	if err := userService.NewUser(user.ToDTO()); err != nil {
 		fmt.Println(err)
 	}
 
-	saved, _ := userService.UserRepository.GetUserByUsername("rcarvalho")
+	saved, err := userService.GetUsersByUsername("rcarv")
+	if err != nil {
+		fmt.Println(err)
+	}
 
-	fmt.Printf("%+v\n", saved)
+	for i, u := range saved {
+		fmt.Printf("%d - %s\n", i, u.Name)
+	}
 }

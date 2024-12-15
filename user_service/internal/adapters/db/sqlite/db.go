@@ -93,9 +93,9 @@ func (db *DB) GetUserByUsername(username string) ([]*model.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
-	stmt := `SELECT * FROM tb_users WHERE username LIKE %?%`
-
-	rows, err := db.DB.QueryContext(ctx, stmt, username)
+	searchUsername := fmt.Sprintf("%%%s%%", username)
+	stmt := `SELECT * FROM tb_users WHERE username LIKE ?`
+	rows, err := db.DB.QueryContext(ctx, stmt, searchUsername)
 	if err != nil {
 		return nil, err
 	}
@@ -120,9 +120,9 @@ func (db *DB) GetUserByUsername(username string) ([]*model.User, error) {
 			&user.UpdatedAt,
 			&user.Active,
 		); err != nil {
+			fmt.Printf("Error: %s\n", err)
 			return nil, err
 		}
-
 		users = append(users, &user)
 	}
 
@@ -133,14 +133,14 @@ func (db *DB) CreateUser(user *model.User) error {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
-	stmt := `INSERT INTO tb_users (username, password, name, birth_date, cnpj, cnh, cnh_type) VALUES (:username, :password, :name, :birth_date, :cnpj, :cnh, :cnh_type)`
+	stmt := `INSERT INTO tb_users (username, password, name, birth_date, cnpj, cnh, cnh_type, cnh_file_path) VALUES (:username, :password, :name, :birth_date, :cnpj, :cnh, :cnh_type, :cnh_file_path)`
 
 	res, err := db.DB.NamedExecContext(ctx, stmt, user)
 	if err != nil {
 		return err
 	}
 
-	fmt.Println(res)
+	fmt.Println(res.RowsAffected())
 
 	return nil
 }
