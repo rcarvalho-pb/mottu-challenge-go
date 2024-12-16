@@ -63,7 +63,8 @@ func (us *UserService) GetUsersByUsername(username string) ([]*dtos.UserDTO, err
 		return nil, err
 	}
 
-	usersDto := make([]*dtos.UserDTO, len(users))
+	usersDto := make([]*dtos.UserDTO, 0)
+
 	for _, u := range users {
 		usersDto = append(usersDto, u.ToDTO())
 	}

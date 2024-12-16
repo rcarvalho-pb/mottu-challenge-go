@@ -179,14 +179,14 @@ func (db *DB) GetUserByUsername(username string) ([]*model.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
-	searchedUsername := fmt.Sprintf("%s%%", username)
 	stmt := `SELECT * FROM tb_users WHERE username LIKE ?`
-	rows, err := db.DB.QueryContext(ctx, stmt, searchedUsername)
+	searchUsername := fmt.Sprintf("%%%s%%", username)
+	rows, err := db.DB.QueryContext(ctx, stmt, searchUsername)
 	if err != nil {
 		return nil, err
 	}
 
-	var users []*model.User
+	users := make([]*model.User, 0)
 
 	for rows.Next() {
 		var user model.User
