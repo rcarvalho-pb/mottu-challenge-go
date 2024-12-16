@@ -59,6 +59,92 @@ func openDB() (*sqlx.DB, error) {
 	return conn, nil
 }
 
+func (db *DB) GetAllUsers() ([]*model.User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	stmt := `
+	SELECT 
+	id, username, password, name, birth_date, cnpj, cnh, cnh_type, cnh_file_path, active_location, created_at, updated_at, active
+	FROM tb_users`
+
+	rows, err := db.DB.QueryContext(ctx, stmt)
+	if err != nil {
+		return nil, err
+	}
+
+	var users []*model.User
+
+	for rows.Next() {
+		var user model.User
+		if err = rows.Scan(
+			&user.ID,
+			&user.Username,
+			&user.Password,
+			&user.Name,
+			&user.BirthDate,
+			&user.CNPJ,
+			&user.CNH,
+			&user.CNHType,
+			&user.CNHFilePath,
+			&user.ActiveLocation,
+			&user.CreatedAt,
+			&user.UpdatedAt,
+			&user.Active,
+		); err != nil {
+			return nil, err
+		}
+
+		users = append(users, &user)
+	}
+
+	return users, err
+}
+
+func (db *DB) GetAllActiveUsers() ([]*model.User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	stmt := `
+	SELECT 
+	id, username, password, name, birth_date, cnpj, cnh, cnh_type, cnh_file_path, active_location, created_at, updated_at, active
+	FROM tb_users
+	WHERE active = true`
+
+	rows, err := db.DB.QueryContext(ctx, stmt)
+	if err != nil {
+		return nil, err
+	}
+
+	var users []*model.User
+
+	for rows.Next() {
+		var user model.User
+		if err = rows.Scan(
+			&user.ID,
+			&user.Username,
+			&user.Password,
+			&user.Name,
+			&user.BirthDate,
+			&user.CNPJ,
+			&user.CNH,
+			&user.CNHType,
+			&user.CNHFilePath,
+			&user.ActiveLocation,
+			&user.CreatedAt,
+			&user.UpdatedAt,
+			&user.Active,
+		); err != nil {
+			return nil, err
+		}
+
+		users = append(users, &user)
+	}
+
+	return users, err
+
+}
+
 func (db *DB) GetUserById(userId int64) (*model.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
@@ -93,9 +179,9 @@ func (db *DB) GetUserByUsername(username string) ([]*model.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
-	searchUsername := fmt.Sprintf("%%%s%%", username)
+	searchedUsername := fmt.Sprintf("%s%%", username)
 	stmt := `SELECT * FROM tb_users WHERE username LIKE ?`
-	rows, err := db.DB.QueryContext(ctx, stmt, searchUsername)
+	rows, err := db.DB.QueryContext(ctx, stmt, searchedUsername)
 	if err != nil {
 		return nil, err
 	}

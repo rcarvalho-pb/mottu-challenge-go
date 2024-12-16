@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS tb_users (
     cnpj TEXT NOT NULL,
     cnh TEXT NOT NULL,
     cnh_type TEXT NOT NULL,
-    cnh_file_path TEXT,
+    cnh_file_path TEXT NOT NULL DEFAULT '',
     active_location BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

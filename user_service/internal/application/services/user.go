@@ -20,6 +20,34 @@ func NewUserService(Repository model.UserRepository) *UserService {
 	}
 }
 
+func (us *UserService) GetAllUsers() ([]*dtos.UserDTO, error) {
+	users, err := us.UserRepository.GetAllUsers()
+	if err != nil {
+		return nil, err
+	}
+
+	var usersDTO []*dtos.UserDTO
+	for _, user := range users {
+		usersDTO = append(usersDTO, user.ToDTO())
+	}
+
+	return usersDTO, err
+}
+
+func (us *UserService) GetAllActiveUsers() ([]*dtos.UserDTO, error) {
+	users, err := us.UserRepository.GetAllActiveUsers()
+	if err != nil {
+		return nil, err
+	}
+
+	var usersDTO []*dtos.UserDTO
+	for _, user := range users {
+		usersDTO = append(usersDTO, user.ToDTO())
+	}
+
+	return usersDTO, err
+}
+
 func (us *UserService) GetUserById(id int64) (*dtos.UserDTO, error) {
 	user, err := us.UserRepository.GetUserById(id)
 	if err != nil {
@@ -102,9 +130,9 @@ func (us *UserService) UpdateUser(userId int64, newUser *dtos.UserDTO) error {
 		user.CNHType = newUser.CNHType
 	}
 
-	if newUser.CNHFilePath != "" {
-		user.CNHFilePath = newUser.CNHFilePath
-	}
+	// if newUser.CNHFilePath != "" {
+	// 	user.CNHFilePath = newUser.CNHFilePath
+	// }
 
 	if user.ActiveLocation != newUser.ActiveLocation {
 		user.ActiveLocation = newUser.ActiveLocation
