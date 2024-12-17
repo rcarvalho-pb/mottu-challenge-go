@@ -5,20 +5,15 @@ import (
 
 	"github.com/rcarvalho-pb/mottu-user_service/internal/adapters/db/sqlite"
 	"github.com/rcarvalho-pb/mottu-user_service/internal/application/services"
+	"github.com/rcarvalho-pb/mottu-user_service/internal/rpc"
 )
 
 func main() {
 	db := sqlite.GetDB()
 	userService := services.NewUserService(db)
 
-	users, err := userService.GetAllActiveUsers()
-	if err != nil {
-		fmt.Println(err)
-	}
+	r := rpc.New(*userService)
 
-	for _, u := range users {
-		fmt.Println(u)
-	}
-
-	fmt.Println(users)
+	fmt.Println("Starting user service")
+	r.RPCListen()
 }

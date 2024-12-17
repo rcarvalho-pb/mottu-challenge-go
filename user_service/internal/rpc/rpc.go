@@ -4,18 +4,33 @@ import (
 	"fmt"
 	"net"
 	"net/rpc"
+
+	"github.com/rcarvalho-pb/mottu-user_service/internal/application/dtos"
+	"github.com/rcarvalho-pb/mottu-user_service/internal/application/services"
 )
 
-type RPCServer struct{}
+type RPCServer struct {
+	userService services.UserService
+}
+
+func New(service services.UserService) *RPCServer {
+	return &RPCServer{
+		userService: service,
+	}
+}
 
 func (r *RPCServer) RPCListen() error {
-	PORT := "5001"
-	listen, err := net.Listen("tcp", fmt.Sprintf("localhost:%s", PORT))
+	listen, err := net.Listen("tcp", ":12345")
 	if err != nil {
 		return err
 	}
 
 	defer listen.Close()
+
+	err = rpc.Register(r)
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	for {
 		rpcConn, err := listen.Accept()
@@ -25,4 +40,49 @@ func (r *RPCServer) RPCListen() error {
 
 		go rpc.ServeConn(rpcConn)
 	}
+}
+
+func (r *RPCServer) GetUserById(userId int64, reply *dtos.UserDTO) error {
+	fmt.Println("Here")
+	fmt.Println(userId)
+	user, err := r.userService.GetUserById(userId)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("%+v\n", user)
+
+	*reply = *user
+
+	return err
+}
+
+func (r *RPCServer) getUsersByUsername(username string, reply []*dtos.UserDTO) error {
+	users, err := r.userService.GetUsersByUsername(username)
+	if err != nil {
+		return err
+	}
+
+	reply = users
+	return err
+}
+
+func (r *RPCServer) getAllActiveUsers(_ any, reply []*dtos.UserDTO) error {
+	users, err := r.userService.GetAllActiveUsers()
+	if err != nil {
+		return err
+	}
+
+	reply = users
+	return err
+}
+
+func (r *RPCServer) GetAllUsers(_ any, reply []*dtos.UserDTO) error {
+	users, err := r.userService.GetAllUsers()
+	if err != nil {
+		return err
+	}
+
+	reply = users
+	return err
 }
