@@ -27,7 +27,7 @@ func (r *RPCServer) RPCListen() error {
 
 	defer listen.Close()
 
-	err = rpc.Register(r)
+	err = rpc.RegisterName("UserService", r)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -57,32 +57,32 @@ func (r *RPCServer) GetUserById(userId int64, reply *dtos.UserDTO) error {
 	return err
 }
 
-func (r *RPCServer) getUsersByUsername(username string, reply []*dtos.UserDTO) error {
+func (r *RPCServer) GetUsersByUsername(username string, reply *[]*dtos.UserDTO) error {
 	users, err := r.userService.GetUsersByUsername(username)
 	if err != nil {
 		return err
 	}
 
-	reply = users
+	*reply = users
 	return err
 }
 
-func (r *RPCServer) getAllActiveUsers(_ any, reply []*dtos.UserDTO) error {
+func (r *RPCServer) GetAllActiveUsers(_ struct{}, reply *[]*dtos.UserDTO) error {
 	users, err := r.userService.GetAllActiveUsers()
 	if err != nil {
 		return err
 	}
 
-	reply = users
+	*reply = users
 	return err
 }
 
-func (r *RPCServer) GetAllUsers(_ any, reply []*dtos.UserDTO) error {
+func (r *RPCServer) GetAllUsers(_ struct{}, reply *[]*dtos.UserDTO) error {
 	users, err := r.userService.GetAllUsers()
 	if err != nil {
 		return err
 	}
 
-	reply = users
+	*reply = users
 	return err
 }
