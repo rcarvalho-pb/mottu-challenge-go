@@ -11,7 +11,7 @@ type UserRepository interface {
 	GetAllUsers() ([]*User, error)
 	GetAllActiveUsers() ([]*User, error)
 	GetUserById(int64) (*User, error)
-	GetUserByUsername(string) ([]*User, error)
+	GetUserByUsername(string) (*User, error)
 	CreateUser(*User) error
 	UpdateUser(*User) error
 }

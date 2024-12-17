@@ -57,19 +57,13 @@ func (us *UserService) GetUserById(id int64) (*dtos.UserDTO, error) {
 	return user.ToDTO(), nil
 }
 
-func (us *UserService) GetUsersByUsername(username string) ([]*dtos.UserDTO, error) {
-	users, err := us.UserRepository.GetUserByUsername(username)
+func (us *UserService) GetUserByUsername(username string) (*dtos.UserDTO, error) {
+	user, err := us.UserRepository.GetUserByUsername(username)
 	if err != nil {
 		return nil, err
 	}
 
-	usersDto := make([]*dtos.UserDTO, 0)
-
-	for _, u := range users {
-		usersDto = append(usersDto, u.ToDTO())
-	}
-
-	return usersDto, nil
+	return user.ToDTO(), nil
 }
 
 func (us *UserService) NewUser(newUser *dtos.UserDTO) error {

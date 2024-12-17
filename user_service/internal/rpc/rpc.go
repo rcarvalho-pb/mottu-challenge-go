@@ -43,27 +43,23 @@ func (r *RPCServer) RPCListen() error {
 }
 
 func (r *RPCServer) GetUserById(userId int64, reply *dtos.UserDTO) error {
-	fmt.Println("Here")
-	fmt.Println(userId)
 	user, err := r.userService.GetUserById(userId)
 	if err != nil {
 		return err
 	}
-
-	fmt.Printf("%+v\n", user)
 
 	*reply = *user
 
 	return err
 }
 
-func (r *RPCServer) GetUsersByUsername(username string, reply *[]*dtos.UserDTO) error {
-	users, err := r.userService.GetUsersByUsername(username)
+func (r *RPCServer) GetUserByUsername(username string, reply *dtos.UserDTO) error {
+	user, err := r.userService.GetUserByUsername(username)
 	if err != nil {
 		return err
 	}
 
-	*reply = users
+	*reply = *user
 	return err
 }
 

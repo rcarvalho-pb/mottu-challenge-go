@@ -1,8 +1,11 @@
 package services
 
 import (
+	"fmt"
+
 	"github.com/rcarvalho-pb/mottu-authentication_service/internal/application/dtos"
 	"github.com/rcarvalho-pb/mottu-authentication_service/internal/domain/model"
+	"github.com/rcarvalho-pb/mottu-authentication_service/internal/rpc"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -16,17 +19,18 @@ func NewUserService(repository model.UserRepository) *UserService {
 	}
 }
 
-func (us *UserService) AuthUser(req dtos.UserRequest) (*model.User, error) {
-	user, err := us.UserRepository.FindUserByUsername(req)
-	if err != nil {
-		return nil, err
+func (us *UserService) AuthUser(req dtos.UserRequest) {
+	user := new(dtos.UserDTO)
+	if err := rpc.Call("UserService.GetUserByUsername", req.Username, user); err != nil {
+		fmt.Println(err)
 	}
 
-	// if err = validatePassword(req.Password, user.Password); err != nil {
-	// 	return nil, fmt.Errorf("inválid user or password")
-	// }
+	if err := validatePassword(user.Password, req.Password); err != nil {
+		fmt.Println(err)
+	}
 
-	return user, nil
+	fmt.Printf("%+v\n", user)
+
 }
 
 func validatePassword(hashedPassword, password string) error {
