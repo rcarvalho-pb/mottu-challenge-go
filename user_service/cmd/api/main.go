@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/rcarvalho-pb/mottu-user_service/internal/adapters/db/sqlite"
 	"github.com/rcarvalho-pb/mottu-user_service/internal/application/services"
@@ -14,6 +15,8 @@ func main() {
 
 	r := rpc.New(*userService)
 
+	port := os.Getenv("PORT")
+	fmt.Println("PORT:", port)
 	fmt.Println("Starting user service")
-	r.RPCListen()
+	r.RPCListen("12345")
 }

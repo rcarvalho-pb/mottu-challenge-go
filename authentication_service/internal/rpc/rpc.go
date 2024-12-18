@@ -8,8 +8,8 @@ import (
 type RPCServer struct {
 }
 
-func Call[T any](service string, args any, reply *T) error {
-	client, err := rpc.Dial("tcp", "localhost:12345")
+func Call[T any](service string, address string, args any, reply *T) error {
+	client, err := rpc.Dial("tcp", address)
 	if err != nil {
 		fmt.Println("Erro ao conectar ao servidor:", err)
 		return err

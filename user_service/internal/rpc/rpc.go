@@ -19,8 +19,8 @@ func New(service services.UserService) *RPCServer {
 	}
 }
 
-func (r *RPCServer) RPCListen() error {
-	listen, err := net.Listen("tcp", ":12345")
+func (r *RPCServer) RPCListen(port string) error {
+	listen, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 	if err != nil {
 		return err
 	}
@@ -45,7 +45,7 @@ func (r *RPCServer) RPCListen() error {
 func (r *RPCServer) GetUserById(userId int64, reply *dtos.UserDTO) error {
 	user, err := r.userService.GetUserById(userId)
 	if err != nil {
-		return err
+		return fmt.Errorf("error getting user by id: %s\n", err)
 	}
 
 	*reply = *user
@@ -56,7 +56,7 @@ func (r *RPCServer) GetUserById(userId int64, reply *dtos.UserDTO) error {
 func (r *RPCServer) GetUserByUsername(username string, reply *dtos.UserDTO) error {
 	user, err := r.userService.GetUserByUsername(username)
 	if err != nil {
-		return err
+		return fmt.Errorf("error getting user by username: %s\n", err)
 	}
 
 	*reply = *user
@@ -66,7 +66,7 @@ func (r *RPCServer) GetUserByUsername(username string, reply *dtos.UserDTO) erro
 func (r *RPCServer) GetAllActiveUsers(_ struct{}, reply *[]*dtos.UserDTO) error {
 	users, err := r.userService.GetAllActiveUsers()
 	if err != nil {
-		return err
+		return fmt.Errorf("error getting all active users: %s\n", err)
 	}
 
 	*reply = users
@@ -76,9 +76,33 @@ func (r *RPCServer) GetAllActiveUsers(_ struct{}, reply *[]*dtos.UserDTO) error 
 func (r *RPCServer) GetAllUsers(_ struct{}, reply *[]*dtos.UserDTO) error {
 	users, err := r.userService.GetAllUsers()
 	if err != nil {
-		return err
+		return fmt.Errorf("error getting all users: %s\n", err)
 	}
 
 	*reply = users
 	return err
+}
+
+func (r *RPCServer) DeactivateUser(userId int64, reply *bool) error {
+	if err := r.userService.DeactivateUserById(userId); err != nil {
+		return fmt.Errorf("error deactivating user [%d]: %s\n", userId, err)
+	}
+
+	*reply = true
+
+	return nil
+}
+
+func (r *RPCServer) ReactivateUser(userId int64, reply *bool) error {
+	if err := r.userService.ReactivateUserById(userId); err != nil {
+		return fmt.Errorf("error reactivating user [%d]: %s\n", userId, err)
+	}
+
+	*reply = true
+
+	return nil
+}
+
+func (r *RPCServer) UpdatePassord() error {
+	return nil
 }
