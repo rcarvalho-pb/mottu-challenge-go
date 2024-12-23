@@ -11,16 +11,18 @@ import (
 
 type RPCServer struct {
 	userService services.UserService
+	Port        string
 }
 
-func New(service services.UserService) *RPCServer {
+func New(service services.UserService, port string) *RPCServer {
 	return &RPCServer{
 		userService: service,
+		Port:        port,
 	}
 }
 
-func (r *RPCServer) RPCListen(port string) error {
-	listen, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
+func (r *RPCServer) RPCListen() error {
+	listen, err := net.Listen("tcp", fmt.Sprintf(":%s", r.Port))
 	if err != nil {
 		return err
 	}

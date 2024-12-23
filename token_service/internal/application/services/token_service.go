@@ -17,15 +17,9 @@ func NewTokenService() *TokenService {
 	return &TokenService{}
 }
 
-type Claims struct {
-	UserID   int64
-	Username string
-	jwt.RegisteredClaims
-}
-
 func (t *TokenService) GenerateJWT(user *dtos.UserDTO) (string, error) {
 	expirationTime := time.Now().Add(24 * time.Hour)
-	claims := &Claims{
+	claims := &dtos.Claims{
 		UserID:   user.Id,
 		Username: user.Username,
 		RegisteredClaims: jwt.RegisteredClaims{
@@ -44,8 +38,8 @@ func (t *TokenService) GenerateJWT(user *dtos.UserDTO) (string, error) {
 	return tokenString, nil
 }
 
-func (t *TokenService) ValidateToken(tokenString string) (*Claims, error) {
-	claims := &Claims{}
+func (t *TokenService) ValidateToken(tokenString string) (*dtos.Claims, error) {
+	claims := &dtos.Claims{}
 
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {

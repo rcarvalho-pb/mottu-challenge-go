@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"os"
 
 	"github.com/rcarvalho-pb/mottu-user_service/internal/adapters/db/sqlite"
@@ -9,14 +9,16 @@ import (
 	"github.com/rcarvalho-pb/mottu-user_service/internal/rpc"
 )
 
+type Config struct {
+	RPCServer *rpc.RPCServer
+}
+
 func main() {
 	db := sqlite.GetDB()
 	userService := services.NewUserService(db)
 
-	r := rpc.New(*userService)
+	port := os.Getenv("USER_SERVICE_ADDRESS")
+	config := &Config{rpc.New(*userService, port)}
 
-	port := os.Getenv("PORT")
-	fmt.Println("PORT:", port)
-	fmt.Println("Starting user service")
-	r.RPCListen("12345")
+	log.Fatal(config.RPCServer.RPCListen())
 }

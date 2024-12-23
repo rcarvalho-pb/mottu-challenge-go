@@ -1,21 +1,30 @@
-UserServiceAddress='12345'
-TokenServiceAddress=12346
-AuthApp=authApp
-UserApp=userApp
-TokenApp=tokenApp
+USER_SERVICE_BINARY=userApp
+USER_SERVICE_ADDRESS=12345
+
+TOKEN_SERVICE_BINARY=tokenService
+TOKEN_SERVICE_ADDRESS=12346
 
 migration:
 	@goose create -dir ./config_databases/files/migrations ${name} sql
 
-run-config-db:
-	@cd config_databases/ && go build -o ./app/configDBApp .
-	@cd config_databases && ./app/configDBApp
+user-service:
+	@echo "Starting user service"
+	@cd ./user_service/ && go build -o app/${USER_SERVICE_BINARY} ./cmd/api
+	@cd ./user_service/ && export USER_SERVICE_ADDRESS=${USER_SERVICE_ADDRESS} && app/${USER_SERVICE_BINARY} &
+	@echo "User service started on port ${USER_SERVICE_ADDRESS}"
 
-run-auth-service:
-	@cd authentication_service && USER_SERVICE_PORT=${UserServiceAddress} TOKEN_SERVICE_PORT=${TokenServiceAddress} go build -o ./app/${AuthApp} ./cmd/api && ./app/${AuthApp}
+token-service:
+	@echo "Starting token service"
+	@cd ./token_service/ && go build -o app/${TOKEN_SERVICE_BINARY} ./cmd/api
+	@cd ./token_service/ && export USER_SERVICE_ADDRESS=${TOKEN_SERVICE_ADDRESS} && app/${TOKEN_SERVICE_BINARY} &
+	@echo "Token service started on port ${TOKEN_SERVICE_ADDRESS}"
 
-run-user-service:
-	@cd user_service && go build -o ./app/${UserApp} ./cmd/api && PORT=${UserServiceAddress} ./app/${UserApp}
 
-run-token-service:
-	@cd token_service && env PORT=${TokenServiceAddress} go build -o ./app/${TokenApp} ./cmd/api && ./app/${TokenApp}
+teste:
+	@cd ./test && go run main.go
+run: user-service token-service
+stop:
+	@echo "Stoping services"
+	pkill -SIGTERM -f "${USER_SERVICE_BINARY}"
+	pkill -SIGTERM -f "${TOKEN_SERVICE_BINARY}"
+	@echo "Services finisheds"

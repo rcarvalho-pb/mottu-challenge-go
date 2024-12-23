@@ -52,7 +52,7 @@ func (r *RPCServer) GenerateToken(dto dtos.UserDTO, reply *string) error {
 	return err
 }
 
-func (r *RPCServer) ValidateToken(tokenString string, reply *services.Claims) error {
+func (r *RPCServer) ValidateToken(tokenString string, reply *dtos.Claims) error {
 	claims, err := r.tokenService.ValidateToken(tokenString)
 	if err != nil {
 		return fmt.Errorf("error validating token: %s", err)
