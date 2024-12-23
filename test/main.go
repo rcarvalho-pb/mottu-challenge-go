@@ -95,4 +95,12 @@ func main() {
 	} else {
 		fmt.Printf("%+v\n", claims)
 	}
+
+	var tokenString2 string
+
+	if err = Call("12347", "AuthService.Authenticate", user, &tokenString2); err != nil {
+		fmt.Println("Erro ao chamar o serviço:", err)
+	} else {
+		fmt.Println(tokenString2)
+	}
 }

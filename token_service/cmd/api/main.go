@@ -1,17 +1,19 @@
 package main
 
 import (
-	"fmt"
+	"log"
+	"os"
 	"rcarvalho-pb/mottu-token_service/internal/application/rpc"
 	"rcarvalho-pb/mottu-token_service/internal/application/services"
 )
 
 func main() {
 
+	tokenServiceAddr := os.Getenv("TOKEN_SERVICE_ADDRESS")
+
 	tokenService := services.NewTokenService()
 
-	r := rpc.New(tokenService)
+	r := rpc.New(tokenServiceAddr, tokenService)
 
-	fmt.Println("Starting user service")
-	r.RPCListen("12346")
+	log.Fatal(r.RPCListen())
 }

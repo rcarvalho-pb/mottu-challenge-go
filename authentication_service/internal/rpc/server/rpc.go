@@ -1,22 +1,22 @@
-package rpc
+package rpc_server
 
 import (
 	"fmt"
 	"net"
 	"net/rpc"
-	"rcarvalho-pb/mottu-token_service/internal/application/dtos"
-	"rcarvalho-pb/mottu-token_service/internal/application/services"
+
+	"github.com/rcarvalho-pb/mottu-authentication_service/internal/application/services"
 )
 
 type RPCServer struct {
-	*services.TokenService
+	services.Service
 	port string
 }
 
-func New(port string, service *services.TokenService) *RPCServer {
+func New(port string, service services.Service) *RPCServer {
 	return &RPCServer{
-		TokenService: service,
-		port:         port,
+		port:    port,
+		Service: service,
 	}
 }
 
@@ -28,7 +28,7 @@ func (r *RPCServer) RPCListen() error {
 
 	defer listen.Close()
 
-	err = rpc.RegisterName("TokenService", r)
+	err = rpc.RegisterName("AuthService", r)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -44,7 +44,7 @@ func (r *RPCServer) RPCListen() error {
 }
 
 func (r *RPCServer) GenerateToken(dto dtos.UserDTO, reply *string) error {
-	tokenString, err := r.GenerateJWT(&dto)
+	tokenString, err := r.tokenService.GenerateJWT(&dto)
 	if err != nil {
 		return err
 	}
@@ -55,7 +55,7 @@ func (r *RPCServer) GenerateToken(dto dtos.UserDTO, reply *string) error {
 }
 
 func (r *RPCServer) ValidateToken(tokenString string, reply *dtos.Claims) error {
-	claims, err := r.GetClaims(tokenString)
+	claims, err := r.tokenService.ValidateToken(tokenString)
 	if err != nil {
 		return fmt.Errorf("error validating token: %s", err)
 	}

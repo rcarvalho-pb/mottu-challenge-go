@@ -38,7 +38,7 @@ func (t *TokenService) GenerateJWT(user *dtos.UserDTO) (string, error) {
 	return tokenString, nil
 }
 
-func (t *TokenService) ValidateToken(tokenString string) (*dtos.Claims, error) {
+func (t *TokenService) GetClaims(tokenString string) (*dtos.Claims, error) {
 	claims := &dtos.Claims{}
 
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (any, error) {

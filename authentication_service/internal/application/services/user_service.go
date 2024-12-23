@@ -1,47 +1,30 @@
 package services
 
 import (
-	"fmt"
-
 	"github.com/rcarvalho-pb/mottu-authentication_service/internal/application/dtos"
-	"github.com/rcarvalho-pb/mottu-authentication_service/internal/rpc"
+	rpc_client "github.com/rcarvalho-pb/mottu-authentication_service/internal/rpc/client"
 	"golang.org/x/crypto/bcrypt"
 )
 
-type UserService struct {
+type userService struct {
+	addr string
 }
 
-func NewUserService() *UserService {
-	return &UserService{}
+func newUserService(userServiceAddr string) *userService {
+	return &userService{
+		addr: userServiceAddr,
+	}
 }
 
-func (us *UserService) AuthUser(req dtos.UserRequest) (string, error) {
-	user := new(dtos.UserDTO)
-	if err := rpc.Call("UserService.GetUserByUsername", "localhost:12345", req.Username, user); err != nil {
-		fmt.Println("error calling rpc server:", err)
+func (us *userService) getUser(username string) (*dtos.UserDTO, error) {
+	var userDto *dtos.UserDTO
+	if err := rpc_client.Call(us.addr, "UserService.GetUserByUsername", username, &userDto); err != nil {
+		return nil, err
 	}
 
-	if err := validatePassword(user.Password, req.Password); err != nil {
-		fmt.Println(err)
-	}
-
-	userDto := struct {
-		Id       int64
-		Username string
-	}{
-		user.Id,
-		user.Username,
-	}
-
-	var tokenString string
-	if err := rpc.Call("TokenService", "localhost:12346", userDto, &tokenString); err != nil {
-		return "", fmt.Errorf("error calling token service: %s\n", err)
-	}
-
-	return tokenString, nil
-
+	return userDto, nil
 }
 
-func validatePassword(hashedPassword, password string) error {
+func (us *userService) validatePassword(hashedPassword, password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }
