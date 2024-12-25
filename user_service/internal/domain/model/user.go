@@ -20,6 +20,7 @@ type User struct {
 	ID             int            `json:"id" db:"id"`
 	Username       string         `json:"username" db:"username"`
 	Password       string         `json:"password" db:"password"`
+	Role           int            `json:"role" db:"role"`
 	Name           string         `json:"name" db:"name"`
 	BirthDate      time.Time      `json:"birth_date" db:"birth_date"`
 	CNPJ           string         `json:"cnpj" db:"cnpj"`
@@ -30,6 +31,10 @@ type User struct {
 	CreatedAt      time.Time      `json:"created_at" db:"created_at"`
 	UpdatedAt      time.Time      `json:"updated_at" db:"updated_at"`
 	Active         bool           `json:"active" db:"active"`
+}
+
+func (u *User) UpdateTime() {
+	u.UpdatedAt = time.Now()
 }
 
 func UserFromDTO(dto *dtos.UserDTO) *User {

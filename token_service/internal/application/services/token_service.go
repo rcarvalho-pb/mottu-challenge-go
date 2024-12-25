@@ -22,6 +22,7 @@ func (t *TokenService) GenerateJWT(user *dtos.UserDTO) (string, error) {
 	claims := &dtos.Claims{
 		UserID:   user.Id,
 		Username: user.Username,
+		UserRole: user.Role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),

@@ -17,7 +17,7 @@ func newTokenService(tokenServiceAddr string) *tokenService {
 	}
 }
 
-func (ts *tokenService) getToken(user *dtos.UserDTO) (string, error) {
+func (ts *tokenService) GetToken(user *dtos.UserDTO) (string, error) {
 	userDto := struct {
 		Id       int64
 		Username string

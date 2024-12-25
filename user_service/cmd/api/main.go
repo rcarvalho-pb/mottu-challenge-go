@@ -14,7 +14,8 @@ type Config struct {
 }
 
 func main() {
-	db := sqlite.GetDB()
+	dbLocation := os.Getenv("DB_LOCATION")
+	db := sqlite.GetDB(dbLocation)
 	userService := services.NewUserService(db)
 
 	port := os.Getenv("USER_SERVICE_ADDRESS")

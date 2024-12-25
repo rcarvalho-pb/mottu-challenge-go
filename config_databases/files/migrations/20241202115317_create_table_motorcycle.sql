@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS tb_motorcycles(
     created_at TIMESTAMP DEFAUL CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_located BOOLEAN DEFAULT FALSE,
+    active BOOLEAN DEFAULT TRUE,
     CONSTRAINT unique_plate UNIQUE (plate),
     CONSTRAINT fk_userid FOREIGN KEY (user_id) REFERENCES tb_users(id)
 );

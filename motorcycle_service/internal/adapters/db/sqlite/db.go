@@ -9,13 +9,6 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-// GetUserById(int64) (*User, error)
-// GetUserByUsername(string) ([]*User, error)
-// CreateUser(User) error
-// UpdateUser(User) error
-
-var dbTimeout = 10 * time.Second
-
 type DB struct {
 	DB *sqlx.DB
 }

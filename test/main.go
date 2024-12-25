@@ -11,6 +11,7 @@ import (
 type UserDTO struct {
 	Username       string    `json:"username"`
 	Password       string    `json:"password"`
+	Role           int       `json:"role"`
 	Name           string    `json:"name"`
 	BirthDate      time.Time `json:"birth_date"`
 	CNPJ           string    `json:"cnpj"`
@@ -23,12 +24,14 @@ type UserDTO struct {
 type Claims struct {
 	UserID   int64
 	Username string
+	UserRole int
 	jwt.RegisteredClaims
 }
 
 type UserDTO2 struct {
 	Id       int64
 	Username string
+	Role     int
 }
 
 func Call[K, T any](port, service string, data K, entry *T) (err error) {
@@ -101,6 +104,6 @@ func main() {
 	if err = Call("12347", "AuthService.Authenticate", user, &tokenString2); err != nil {
 		fmt.Println("Erro ao chamar o serviço:", err)
 	} else {
-		fmt.Println(tokenString2)
+		fmt.Println("Authenticate:", tokenString2)
 	}
 }

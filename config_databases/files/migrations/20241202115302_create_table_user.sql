@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS tb_users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT NOT NULL,
     password TEXT NOT NULL,
+    role INTEGER DEFAULT 1,
     name TEXT NOT NULL,
     birth_date TIMESTAMP NOT NULL,
     cnpj TEXT NOT NULL,

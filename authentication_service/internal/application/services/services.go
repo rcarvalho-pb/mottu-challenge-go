@@ -21,7 +21,7 @@ func (s *Service) AuthenticateUser(request dtos.UserRequest) (string, error) {
 		return "", err
 	}
 
-	tokenString, err := s.getToken(user)
+	tokenString, err := s.GetToken(user)
 	if err != nil {
 		return "", err
 	}

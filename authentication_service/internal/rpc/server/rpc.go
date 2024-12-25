@@ -5,6 +5,7 @@ import (
 	"net"
 	"net/rpc"
 
+	"github.com/rcarvalho-pb/mottu-authentication_service/internal/application/dtos"
 	"github.com/rcarvalho-pb/mottu-authentication_service/internal/application/services"
 )
 
@@ -43,8 +44,8 @@ func (r *RPCServer) RPCListen() error {
 	}
 }
 
-func (r *RPCServer) GenerateToken(dto dtos.UserDTO, reply *string) error {
-	tokenString, err := r.tokenService.GenerateJWT(&dto)
+func (r *RPCServer) Authenticate(dto dtos.UserDTO, reply *string) error {
+	tokenString, err := r.Service.GetToken(&dto)
 	if err != nil {
 		return err
 	}
@@ -52,15 +53,4 @@ func (r *RPCServer) GenerateToken(dto dtos.UserDTO, reply *string) error {
 	*reply = tokenString
 
 	return err
-}
-
-func (r *RPCServer) ValidateToken(tokenString string, reply *dtos.Claims) error {
-	claims, err := r.tokenService.ValidateToken(tokenString)
-	if err != nil {
-		return fmt.Errorf("error validating token: %s", err)
-	}
-
-	*reply = *claims
-
-	return nil
 }
