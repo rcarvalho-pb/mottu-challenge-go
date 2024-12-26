@@ -7,20 +7,37 @@ import (
 	"github.com/rcarvalho-pb/mottu-motorcycle_service/internal/model"
 )
 
-// GetAllMotorcycles() ([]*Motorcycle, error)
-// GetAllActiveMotorcycle() ([]*Motorcycle, error)
-// GetMotorcyclesByYear(int64) ([]*Motorcycle, error)
-// GetMotorcycleByModel(string) ([]*Motorcycle, error)
-
-// user_id INTEGER,
-// year INT NOT NULL,
-// model TEXT NOT NULL,
-// plate TEXT NOT NULL,
-// created_at TIMESTAMP DEFAUL CURRENT_TIMESTAMP,
-// updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-// is_located BOOLEAN DEFAULT FALSE,
-
 var dbTimeout = 10 * time.Second
+
+func (db *DB) GetMotorcyclesByModel(motorcycleModel string) ([]*model.Motorcycle, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	stmt := `SELECT * FROM tb_motorcycle WHERE active = true and model = ?`
+
+	var motorcycles []*model.Motorcycle
+
+	if err := db.DB.SelectContext(ctx, &motorcycles, stmt, motorcycleModel); err != nil {
+		return nil, err
+	}
+
+	return motorcycles, nil
+}
+
+func (db *DB) GetMotorcyclesByYear(year int64) ([]*model.Motorcycle, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	stmt := `SELECT * FROM tb_motorcycle WHERE active = true and year = ?`
+
+	var motorcycles []*model.Motorcycle
+
+	if err := db.DB.SelectContext(ctx, &motorcycles, stmt); err != nil {
+		return nil, err
+	}
+
+	return motorcycles, nil
+}
 
 func (db *DB) GetAllMotorcycles() ([]*model.Motorcycle, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
@@ -30,7 +47,26 @@ func (db *DB) GetAllMotorcycles() ([]*model.Motorcycle, error) {
 
 	var motorcycles []*model.Motorcycle
 
-	db.DB.SelectContex(ctx, motorcycles, stmt)
+	if err := db.DB.SelectContext(ctx, &motorcycles, stmt); err != nil {
+		return nil, err
+	}
+
+	return motorcycles, nil
+}
+
+func (db *DB) GetAllActiveMotorcycles() ([]*model.Motorcycle, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	stmt := `SELECT * FROM tb_motorcycle WHERE active = true`
+
+	var motorcycles []*model.Motorcycle
+
+	if err := db.DB.SelectContext(ctx, &motorcycles, stmt); err != nil {
+		return nil, err
+	}
+
+	return motorcycles, nil
 }
 
 func (db *DB) UpdateMotorcycle(motorcycle *model.Motorcycle) error {
@@ -38,10 +74,8 @@ func (db *DB) UpdateMotorcycle(motorcycle *model.Motorcycle) error {
 	defer cancel()
 
 	stmt := `UPDATE tb_motorcycles
-	SET year = :year, model = :model, plate = :plate
+	SET user_id = :user_id, year = :year, model = :model, plate = :plate, updated_at = :updated_at, is_located = :is_located, active = :active
 	WHERE id = :id`
-
-	motorcycle.UpdateTime()
 
 	if _, err := db.DB.NamedExecContext(ctx, stmt, motorcycle); err != nil {
 		return err
@@ -106,6 +140,21 @@ func (db *DB) GetMotorcycleById(motorcycleId int64) (*model.Motorcycle, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
+	stmt := `SELECT * FROM tb_motorcycles WHERE active = true AND id = ?`
+
+	var motorcycle *model.Motorcycle
+
+	if err := db.DB.GetContext(ctx, motorcycle, stmt, motorcycleId); err != nil {
+		return nil, err
+	}
+
+	return motorcycle, nil
+}
+
+func (db *DB) GetMotorcycleByIdAdmin(motorcycleId int64) (*model.Motorcycle, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
 	stmt := `SELECT * FROM tb_motorcycles WHERE id = ?`
 
 	var motorcycle *model.Motorcycle
@@ -117,7 +166,7 @@ func (db *DB) GetMotorcycleById(motorcycleId int64) (*model.Motorcycle, error) {
 	return motorcycle, nil
 }
 
-func (db *DB) CreateMotorcycle(motorcycle model.Motorcycle) error {
+func (db *DB) CreateMotorcycle(motorcycle *model.Motorcycle) error {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
@@ -128,24 +177,6 @@ func (db *DB) CreateMotorcycle(motorcycle model.Motorcycle) error {
 	}
 
 	return nil
-}
-
-func (db *DB) DeleteMotorcycleById(motorcycleId int64) error {
-	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
-	defer cancel()
-
-	motorcycle, err := db.GetMotorcycleById(motorcycleId)
-	if err != nil {
-		return err
-	}
-
-	motorcycle.Active = false
-	motorcycle.UpdateTime()
-
-	stmt := `UPDATE tb_motorcycles
-	SET active = :active, updated_at = :updated_at
-	WHERE id = :id`
-
 }
 
 func (db *DB) GetMotorcycleByUserId(motorcycleId int64) (*model.Motorcycle, error) {
