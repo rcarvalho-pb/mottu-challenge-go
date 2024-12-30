@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/rcarvalho-pb/mottu-motorcycle_service/internal/application/dtos"
 	"github.com/rcarvalho-pb/mottu-motorcycle_service/internal/model"
 )
 
@@ -74,7 +75,7 @@ func (db *DB) UpdateMotorcycle(motorcycle *model.Motorcycle) error {
 	defer cancel()
 
 	stmt := `UPDATE tb_motorcycles
-	SET user_id = :user_id, year = :year, model = :model, plate = :plate, updated_at = :updated_at, is_located = :is_located, active = :active
+	SET year = :year, model = :model, plate = :plate, updated_at = :updated_at, is_located = :is_located, active = :active
 	WHERE id = :id`
 
 	if _, err := db.DB.NamedExecContext(ctx, stmt, motorcycle); err != nil {
@@ -84,7 +85,7 @@ func (db *DB) UpdateMotorcycle(motorcycle *model.Motorcycle) error {
 	return nil
 }
 
-func (db *DB) LocateMotorcycle(motorcycleId, userId int64) error {
+func (db *DB) LocateMotorcycle(motorcycleId int64) error {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
@@ -94,10 +95,9 @@ func (db *DB) LocateMotorcycle(motorcycleId, userId int64) error {
 	}
 
 	stmt := `UPDATE tb_motorcycles 
-	SET user_id = :user_id, updated_at = :updated_at, is_located = :is_located 
+	SET updated_at = :updated_at, is_located = :is_located 
 	WHERE id = :id`
 
-	motorcycle.UserId = userId
 	motorcycle.UpdateTime()
 	motorcycle.IsLocated = true
 
@@ -110,21 +110,20 @@ func (db *DB) LocateMotorcycle(motorcycleId, userId int64) error {
 	return nil
 }
 
-func (db *DB) UnlocateMotorcycle(userId int64) error {
+func (db *DB) UnlocateMotorcycle(motorcycleId int64) error {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
-	motorcycle, err := db.GetMotorcycleByUserId(userId)
+	motorcycle, err := db.GetMotorcycleById(motorcycleId)
 	if err != nil {
 		return err
 	}
 
-	motorcycle.UserId = 0
 	motorcycle.UpdateTime()
 	motorcycle.IsLocated = false
 
 	stmt := `UPDATE tb_motorcycles 
-	SET user_id = :user_id, updated_at = :updated_at, is_located = :is_located 
+	SET updated_at = :updated_at, is_located = :is_located 
 	WHERE id = :id`
 
 	tx := db.DB.MustBegin()
@@ -166,30 +165,15 @@ func (db *DB) GetMotorcycleByIdAdmin(motorcycleId int64) (*model.Motorcycle, err
 	return motorcycle, nil
 }
 
-func (db *DB) CreateMotorcycle(motorcycle *model.Motorcycle) error {
+func (db *DB) CreateMotorcycle(request *dtos.NewMotorcycleRequest) error {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
 	stmt := `INSERT INTO tb_motorcycles (year, model, plate) VALUES (:year, :model, :plate)`
 
-	if _, err := db.DB.NamedExecContext(ctx, stmt, &motorcycle); err != nil {
+	if _, err := db.DB.NamedExecContext(ctx, stmt, &request); err != nil {
 		return err
 	}
 
 	return nil
-}
-
-func (db *DB) GetMotorcycleByUserId(motorcycleId int64) (*model.Motorcycle, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
-	defer cancel()
-
-	stmt := `SELECT * FROM tb_motorcycles WHERE id = ?`
-
-	var motorcycle model.Motorcycle
-
-	if err := db.DB.GetContext(ctx, &motorcycle, stmt, motorcycleId); err != nil {
-		return nil, err
-	}
-
-	return &motorcycle, nil
 }

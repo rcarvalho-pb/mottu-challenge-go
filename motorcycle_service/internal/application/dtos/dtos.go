@@ -4,7 +4,6 @@ import "time"
 
 type MotorcycleDTO struct {
 	Id        int64     `json:"id"`
-	UserId    int64     `json:"user_id"`
 	Year      int64     `json:"year"`
 	Model     string    `json:"model"`
 	Plate     string    `json:"plate"`
@@ -12,4 +11,10 @@ type MotorcycleDTO struct {
 	UpdatedAt time.Time `json:"updated_at"`
 	IsLocated bool      `json:"is_located"`
 	Active    bool      `json:"active"`
+}
+
+type NewMotorcycleRequest struct {
+	Year  int64  `json:"year"`
+	Model string `json:"model"`
+	Plate string `json:"plate"`
 }

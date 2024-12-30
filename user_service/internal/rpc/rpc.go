@@ -10,11 +10,11 @@ import (
 )
 
 type RPCServer struct {
-	userService services.UserService
+	userService *services.UserService
 	Port        string
 }
 
-func New(service services.UserService, port string) *RPCServer {
+func New(service *services.UserService, port string) *RPCServer {
 	return &RPCServer{
 		userService: service,
 		Port:        port,

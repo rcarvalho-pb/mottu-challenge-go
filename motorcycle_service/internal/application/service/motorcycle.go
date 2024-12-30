@@ -1,49 +1,91 @@
 package service
 
 import (
-	"fmt"
-
 	"github.com/rcarvalho-pb/mottu-motorcycle_service/internal/application/dtos"
 	"github.com/rcarvalho-pb/mottu-motorcycle_service/internal/model"
 )
 
-type motorcycleService struct {
-	model.MotorcycleRepository
+type MotorcycleService struct {
+	repository model.MotorcycleRepository
 }
 
-// GetMotorcycleById(int64) (*Motorcycle, error)
-// GetMotorcycleByUserId(int64) (*Motorcycle, error)
-// GetAllMotorcycles() ([]*Motorcycle, error)
-// GetAllActiveMotorcycles() ([]*Motorcycle, error)
-// GetMotorcyclesByYear(int64) ([]*Motorcycle, error)
-// GetMotorcyclesByModel(string) ([]*Motorcycle, error)
-// CreateMotorcycle(Motorcycle) error
-// UpdateMotorcycle(Motorcycle) error
-// DeleteMotorcycleById(int64) error
-// LocateMotorcycle(int64) error
-// UnlocateMotorcycle(int64) error
+func (ms *MotorcycleService) GetMotorcycleById(motorcycleId int64) (*dtos.MotorcycleDTO, error) {
+	motorcycle, err := ms.repository.GetMotorcycleById(motorcycleId)
+	if err != nil {
+		return nil, err
+	}
 
-// UserId    int64     `json:"user_id" db:"user_id"`
-// 	Year      int64     `json:"year" db:"year"`
-// 	Model     string    `json:"model" db:"model"`
-// 	Plate     string    `json:"plate" db:"plate"`
-// 	CreatedAt time.Time `json:"created_at" db:"created_at"`
-// 	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
-// 	IsLocated bool      `json:"is_located" db:"is_located"`
-// 	Active
+	return motorcycle.ToDTO(), err
+}
 
-func (ms *motorcycleService) CreateMotorcycle(dto *dtos.MotorcycleDTO) error {
-	motorcycle := model.MotorcycleFromDTO(dto)
+func (ms *MotorcycleService) GetAllMotorcycles() ([]*dtos.MotorcycleDTO, error) {
+	motorcycles, err := ms.repository.GetAllMotorcycles()
+	if err != nil {
+		return nil, err
+	}
 
-	if err := ms.MotorcycleRepository.CreateMotorcycle(motorcycle); err != nil {
+	motorcyclesDTO := make([]*dtos.MotorcycleDTO, len(motorcycles))
+	for i, m := range motorcycles {
+		motorcyclesDTO[i] = m.ToDTO()
+	}
+
+	return motorcyclesDTO, nil
+}
+
+func (ms *MotorcycleService) GetAllActiveMotorcycles() ([]*dtos.MotorcycleDTO, error) {
+	motorcycles, err := ms.repository.GetAllActiveMotorcycles()
+	if err != nil {
+		return nil, err
+	}
+
+	motorcyclesDTO := make([]*dtos.MotorcycleDTO, len(motorcycles))
+	for i, m := range motorcycles {
+		motorcyclesDTO[i] = m.ToDTO()
+	}
+
+	return motorcyclesDTO, nil
+}
+
+func (ms *MotorcycleService) GetMotorcyclesByYear(year int64) ([]*dtos.MotorcycleDTO, error) {
+	motorcycles, err := ms.repository.GetMotorcyclesByYear(year)
+	if err != nil {
+		return nil, err
+	}
+
+	motorcyclesDTO := make([]*dtos.MotorcycleDTO, len(motorcycles))
+
+	for i, m := range motorcycles {
+		motorcyclesDTO[i] = m.ToDTO()
+	}
+
+	return motorcyclesDTO, nil
+}
+
+func (ms *MotorcycleService) GetMotorcyclesByModel(model string) ([]*dtos.MotorcycleDTO, error) {
+	motorcycles, err := ms.repository.GetMotorcyclesByModel(model)
+	if err != nil {
+		return nil, err
+	}
+
+	motorcyclesDTO := make([]*dtos.MotorcycleDTO, len(motorcycles))
+
+	for i, m := range motorcycles {
+		motorcyclesDTO[i] = m.ToDTO()
+	}
+
+	return motorcyclesDTO, nil
+}
+
+func (ms *MotorcycleService) CreateMotorcycle(req *dtos.NewMotorcycleRequest) error {
+	if err := ms.repository.CreateMotorcycle(req); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (ms *motorcycleService) UpdateMotorcycle(dto *dtos.MotorcycleDTO) error {
-	motorcycle, err := ms.MotorcycleRepository.GetMotorcycleById(dto.Id)
+func (ms *MotorcycleService) UpdateMotorcycle(dto *dtos.MotorcycleDTO) error {
+	motorcycle, err := ms.repository.GetMotorcycleById(dto.Id)
 	if err != nil {
 		return err
 	}
@@ -53,27 +95,55 @@ func (ms *motorcycleService) UpdateMotorcycle(dto *dtos.MotorcycleDTO) error {
 	motorcycle.Plate = dto.Plate
 	motorcycle.UpdateTime()
 
-	if err := ms.MotorcycleRepository.UpdateMotorcycle(motorcycle); err != nil {
+	if err := ms.repository.UpdateMotorcycle(motorcycle); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (ms *motorcycleService) DeleteMotorcycleById(motorcycleId int64) error {
-	motorcycle, err := ms.MotorcycleRepository.GetMotorcycleById(motorcycleId)
+func (ms *MotorcycleService) DeleteMotorcycleById(motorcycleId int64) error {
+	motorcycle, err := ms.repository.GetMotorcycleById(motorcycleId)
 	if err != nil {
 		return err
-	}
-
-	if motorcycle.UserId != 0 {
-		return fmt.Errorf("motorcycle is located, remove location before deleting")
 	}
 
 	motorcycle.UpdateTime()
 	motorcycle.Active = false
 
-	if err = ms.MotorcycleRepository.UpdateMotorcycle(motorcycle); err != nil {
+	if err = ms.repository.UpdateMotorcycle(motorcycle); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (ms *MotorcycleService) LocateMotorcycle(motorcycleId int64) error {
+	motorcycle, err := ms.repository.GetMotorcycleById(motorcycleId)
+	if err != nil {
+		return err
+	}
+
+	motorcycle.UpdateTime()
+	motorcycle.IsLocated = true
+
+	if err = ms.repository.UpdateMotorcycle(motorcycle); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (ms *MotorcycleService) UnlocateMotorcycle(motorcycleId int64) error {
+	motorcycle, err := ms.repository.GetMotorcycleById(motorcycleId)
+	if err != nil {
+		return err
+	}
+
+	motorcycle.UpdateTime()
+	motorcycle.IsLocated = false
+
+	if err = ms.repository.UpdateMotorcycle(motorcycle); err != nil {
 		return err
 	}
 

@@ -12,6 +12,9 @@ TOKEN_SERVICE_ADDRESS=12346
 AUTH_SERVICE_BINARY=authApp
 AUTH_SERVICE_ADDRESS=12347
 
+LOCATION_SERVICE_BINARY=locationApp
+LOCATION_SERVICE_ADDRESS=12348
+
 migration:
 	@goose create -dir ./config_databases/files/migrations ${name} sql
 
@@ -31,6 +34,12 @@ user-service:
 	@cd ./user_service/ && go build -o app/${USER_SERVICE_BINARY} ./cmd/api
 	@cd ./user_service/ && export DB_LOCATION=${DB_LOCATION} USER_SERVICE_ADDRESS=${USER_SERVICE_ADDRESS} && app/${USER_SERVICE_BINARY} &
 	@echo "User service started on port ${USER_SERVICE_ADDRESS}"
+
+location-service:
+	@echo "Starting location service"
+	@cd ./location_service/ && go build -o app/${LOCATION_SERVICE_BINARY} ./cmd/api
+	@cd ./location_service/ && export DB_LOCATION=${DB_LOCATION} LOCATION_SERVICE_ADDRESS=${LOCATION_SERVICE_ADDRESS} && app/${LOCATION_SERVICE_BINARY} &
+	@echo "User location started on port ${LOCATION_SERVICE_ADDRESS}"
 
 token-service:
 	@echo "Starting token service"

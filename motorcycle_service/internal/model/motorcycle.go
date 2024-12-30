@@ -13,13 +13,12 @@ type MotorcycleRepository interface {
 	GetAllActiveMotorcycles() ([]*Motorcycle, error)
 	GetMotorcyclesByYear(int64) ([]*Motorcycle, error)
 	GetMotorcyclesByModel(string) ([]*Motorcycle, error)
-	CreateMotorcycle(*Motorcycle) error
+	CreateMotorcycle(*dtos.NewMotorcycleRequest) error
 	UpdateMotorcycle(*Motorcycle) error
 }
 
 type Motorcycle struct {
 	Id        int64     `json:"id" db:"id"`
-	UserId    int64     `json:"user_id" db:"user_id"`
 	Year      int64     `json:"year" db:"year"`
 	Model     string    `json:"model" db:"model"`
 	Plate     string    `json:"plate" db:"plate"`
@@ -36,7 +35,6 @@ func (m *Motorcycle) UpdateTime() {
 func (m *Motorcycle) ToDTO() *dtos.MotorcycleDTO {
 	return &dtos.MotorcycleDTO{
 		Id:        m.Id,
-		UserId:    m.UserId,
 		Year:      m.Year,
 		Model:     m.Model,
 		Plate:     m.Plate,
@@ -50,7 +48,6 @@ func (m *Motorcycle) ToDTO() *dtos.MotorcycleDTO {
 func MotorcycleFromDTO(dto *dtos.MotorcycleDTO) *Motorcycle {
 	return &Motorcycle{
 		Id:        dto.Id,
-		UserId:    dto.UserId,
 		Year:      dto.Year,
 		Model:     dto.Model,
 		Plate:     dto.Plate,

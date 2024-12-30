@@ -19,7 +19,7 @@ func main() {
 	userService := services.NewUserService(db)
 
 	port := os.Getenv("USER_SERVICE_ADDRESS")
-	config := &Config{rpc.New(*userService, port)}
+	config := &Config{rpc.New(userService, port)}
 
 	log.Fatal(config.RPCServer.RPCListen())
 }
