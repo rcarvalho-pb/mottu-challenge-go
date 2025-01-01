@@ -9,6 +9,12 @@ type MotorcycleService struct {
 	repository model.MotorcycleRepository
 }
 
+func New(repository model.MotorcycleRepository) *MotorcycleService {
+	return &MotorcycleService{
+		repository: repository,
+	}
+}
+
 func (ms *MotorcycleService) GetMotorcycleById(motorcycleId int64) (*dtos.MotorcycleDTO, error) {
 	motorcycle, err := ms.repository.GetMotorcycleById(motorcycleId)
 	if err != nil {

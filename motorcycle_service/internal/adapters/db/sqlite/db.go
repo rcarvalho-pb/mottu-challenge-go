@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
-	_ "github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
 )
 

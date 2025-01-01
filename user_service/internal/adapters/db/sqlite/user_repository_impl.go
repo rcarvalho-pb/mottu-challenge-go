@@ -26,7 +26,7 @@ func (db *DB) GetAllUsers() ([]*model.User, error) {
 	for rows.Next() {
 		var user model.User
 		if err = rows.Scan(
-			&user.ID,
+			&user.Id,
 			&user.Username,
 			&user.Password,
 			&user.Role,
@@ -70,7 +70,7 @@ func (db *DB) GetAllActiveUsers() ([]*model.User, error) {
 	for rows.Next() {
 		var user model.User
 		if err = rows.Scan(
-			&user.ID,
+			&user.Id,
 			&user.Username,
 			&user.Password,
 			&user.Role,
@@ -105,7 +105,7 @@ func (db *DB) GetUserById(userId int64) (*model.User, error) {
 
 	var user model.User
 	if err := row.Scan(
-		&user.ID,
+		&user.Id,
 		&user.Username,
 		&user.Password,
 		&user.Role,
@@ -136,7 +136,7 @@ func (db *DB) GetUserByUsername(username string) (*model.User, error) {
 	user := new(model.User)
 
 	if err := row.Scan(
-		&user.ID,
+		&user.Id,
 		&user.Username,
 		&user.Password,
 		&user.Role,
@@ -175,7 +175,7 @@ func (db *DB) GetUsersByName(name string) ([]*model.User, error) {
 	for rows.Next() {
 		var user model.User
 		if err = rows.Scan(
-			&user.ID,
+			&user.Id,
 			&user.Username,
 			&user.Password,
 			&user.Role,

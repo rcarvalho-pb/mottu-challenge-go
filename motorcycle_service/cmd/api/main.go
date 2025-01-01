@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/rcarvalho-pb/mottu-motorcycle_service/internal/adapters/db/sqlite"
+	"github.com/rcarvalho-pb/mottu-motorcycle_service/internal/application/service"
 	"github.com/rcarvalho-pb/mottu-motorcycle_service/internal/rpc"
 )
 
@@ -15,7 +16,7 @@ type Config struct {
 func main() {
 	dbLocation := os.Getenv("DB_LOCATION")
 	db := sqlite.GetDB(dbLocation)
-	motorcycleService := services.NewMotorcycleService(db)
+	motorcycleService := service.New(db)
 
 	port := os.Getenv("USER_SERVICE_ADDRESS")
 	config := &Config{rpc.New(*motorcycleService, port)}

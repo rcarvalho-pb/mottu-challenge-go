@@ -18,7 +18,7 @@ func main() {
 	db := sqlite.GetDB(dbLocation)
 	locationService := service.New(db)
 
-	port := os.Getenv("USER_SERVICE_ADDRESS")
+	port := os.Getenv("LOCATION_SERVICE_ADDRESS")
 	config := &Config{rpc_server.New(locationService, port)}
 
 	log.Fatal(config.RPCServer.RPCListen())

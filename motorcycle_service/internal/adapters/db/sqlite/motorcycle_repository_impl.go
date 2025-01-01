@@ -10,11 +10,27 @@ import (
 
 var dbTimeout = 10 * time.Second
 
+// GetMotorcycleById(int64) (*Motorcycle, error)
+// GetAllMotorcycles() ([]*Motorcycle, error)
+// GetAllActiveMotorcycles() ([]*Motorcycle, error)
+// GetMotorcyclesByYear(int64) ([]*Motorcycle, error)
+// GetMotorcyclesByModel(string) ([]*Motorcycle, error)
+// CreateMotorcycle(*dtos.NewMotorcycleRequest) error
+// UpdateMotorcycle(*Motorcycle) error
+
+//  GetMotorcycleById(int64) (*Motorcycle, error)
+// 	GetAllMotorcycles() ([]*Motorcycle, error)
+// 	GetAllActiveMotorcycles() ([]*Motorcycle, error)
+// 	GetMotorcyclesByYear(int64) ([]*Motorcycle, error)
+// 	GetMotorcyclesByModel(string) ([]*Motorcycle, error)
+// 	CreateMotorcycle(*dtos.NewMotorcycleRequest) error
+// 	UpdateMotorcycle(*Motorcycle) error
+
 func (db *DB) GetMotorcyclesByModel(motorcycleModel string) ([]*model.Motorcycle, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
-	stmt := `SELECT * FROM tb_motorcycle WHERE active = true and model = ?`
+	stmt := `SELECT * FROM tb_motorcycles WHERE active = true and model = ?`
 
 	var motorcycles []*model.Motorcycle
 
@@ -29,7 +45,7 @@ func (db *DB) GetMotorcyclesByYear(year int64) ([]*model.Motorcycle, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
-	stmt := `SELECT * FROM tb_motorcycle WHERE active = true and year = ?`
+	stmt := `SELECT * FROM tb_motorcycles WHERE active = true and year = ?`
 
 	var motorcycles []*model.Motorcycle
 
@@ -44,7 +60,7 @@ func (db *DB) GetAllMotorcycles() ([]*model.Motorcycle, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
-	stmt := `SELECT * FROM tb_motorcycle`
+	stmt := `SELECT * FROM tb_motorcycles`
 
 	var motorcycles []*model.Motorcycle
 
@@ -59,7 +75,7 @@ func (db *DB) GetAllActiveMotorcycles() ([]*model.Motorcycle, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
-	stmt := `SELECT * FROM tb_motorcycle WHERE active = true`
+	stmt := `SELECT * FROM tb_motorcycles WHERE active = true`
 
 	var motorcycles []*model.Motorcycle
 

@@ -13,7 +13,7 @@ AUTH_SERVICE_BINARY=authApp
 AUTH_SERVICE_ADDRESS=12347
 
 LOCATION_SERVICE_BINARY=locationApp
-LOCATION_SERVICE_ADDRESS=12348
+LOCATION_SERVICE_ADDRESS=12349
 
 migration:
 	@goose create -dir ./config_databases/files/migrations ${name} sql
@@ -26,7 +26,7 @@ config-db:
 motorcycle-service:
 	@echo "Starting motorcycle service"
 	@cd ./motorcycle_service/ && go build -o app/${MOTORCYCLE_SERVICE_BINARY} ./cmd/api
-	@cd ./motorcycle_service/ && export DB_LOCATION=${DB_LOCATION} USER_SERVICE_ADDRESS=${MOTORCYCLE_SERVICE_ADDRESS} && app/${USER_SERVICE_BINARY} &
+	@cd ./motorcycle_service/ && export DB_LOCATION=${DB_LOCATION} USER_SERVICE_ADDRESS=${MOTORCYCLE_SERVICE_ADDRESS} && app/${MOTORCYCLE_SERVICE_BINARY} &
 	@echo "Motorcycle service started on port ${MOTORCYCLE_SERVICE_ADDRESS}"
 
 user-service:
@@ -55,10 +55,12 @@ auth-service:
 
 teste:
 	@cd ./test && go run main.go
-run: user-service token-service auth-service
+run: user-service token-service auth-service motorcycle-service location-service
 stop:
 	@echo "Stoping services"
 	pkill -SIGTERM -f "${USER_SERVICE_BINARY}"
 	pkill -SIGTERM -f "${TOKEN_SERVICE_BINARY}"
 	pkill -SIGTERM -f "${AUTH_SERVICE_BINARY}"
+	pkill -SIGTERM -f "${MOTORCYCLE_SERVICE_BINARY}"
+	pkill -SIGTERM -f "${LOCATION_SERVICE_BINARY}"
 	@echo "Services finisheds"

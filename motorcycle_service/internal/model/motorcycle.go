@@ -8,7 +8,6 @@ import (
 
 type MotorcycleRepository interface {
 	GetMotorcycleById(int64) (*Motorcycle, error)
-	GetMotorcycleByUserId(int64) (*Motorcycle, error)
 	GetAllMotorcycles() ([]*Motorcycle, error)
 	GetAllActiveMotorcycles() ([]*Motorcycle, error)
 	GetMotorcyclesByYear(int64) ([]*Motorcycle, error)

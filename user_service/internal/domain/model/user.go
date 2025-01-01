@@ -17,7 +17,7 @@ type UserRepository interface {
 }
 
 type User struct {
-	ID             int            `json:"id" db:"id"`
+	Id             int64          `json:"id" db:"id"`
 	Username       string         `json:"username" db:"username"`
 	Password       string         `json:"password" db:"password"`
 	Role           int            `json:"role" db:"role"`
@@ -39,6 +39,7 @@ func (u *User) UpdateTime() {
 
 func UserFromDTO(dto *dtos.UserDTO) *User {
 	return &User{
+		Id:        dto.Id,
 		Username:  dto.Username,
 		Password:  dto.Password,
 		Name:      dto.Username,
@@ -56,6 +57,7 @@ func UserFromDTO(dto *dtos.UserDTO) *User {
 
 func (u *User) ToDTO() *dtos.UserDTO {
 	return &dtos.UserDTO{
+		Id:             u.Id,
 		Username:       u.Username,
 		Password:       u.Password,
 		Name:           u.Name,

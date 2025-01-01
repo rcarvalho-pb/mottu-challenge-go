@@ -2,17 +2,10 @@ package sqlite
 
 import (
 	"context"
+	"time"
 
 	"github.com/rcarvalho-pb/mottu-location_service/internal/model"
 )
-
-// UserId        int64     `json:"user_id" db:"user_id"`
-// MotorcycleId  int64     `json:"motorcycle_id" db:"motorcycle_id"`
-// Price         float64   `json:"price" db:"price"`
-// Days          int64     `json:"days" db:"days"`
-// LocationDay   time.Time `json:"location_day" db:"location_day"`
-// DevolutionDay time.Time `json:"devolution_day" db:"devolution_day"`
-// Fine          float64   `json:"fine" db:"fine"`
 
 func (db *DB) CreateLocation(location *model.Location) error {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
@@ -42,6 +35,21 @@ func (db *DB) UpdateLocation(location *model.Location) error {
 	}
 
 	return nil
+}
+
+func (db *DB) GetLocationById(id int64) (*model.Location, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	stmt := `SELECT * FROM tb_locations WHERE id = :id`
+
+	var location *model.Location
+
+	if err := db.db.GetContext(ctx, &location, stmt, id); err != nil {
+		return nil, err
+	}
+
+	return location, nil
 }
 
 func (db *DB) GetLocationsByUserId(userId int64) ([]*model.Location, error) {
@@ -103,4 +111,17 @@ func (db *DB) GetAllLocations() ([]*model.Location, error) {
 	}
 
 	return locations, nil
+}
+
+func (db *DB) EndLocation(id int64) error {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	stmt := `UPDATE tb_locations SET updated_at = ?, active = false WHERE id = ?`
+
+	if _, err := db.db.ExecContext(ctx, stmt, time.Now(), id); err != nil {
+		return err
+	}
+
+	return nil
 }

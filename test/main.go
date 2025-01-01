@@ -8,6 +8,30 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+type LocationDTO struct {
+	Id            int64     `json:"id"`
+	UserId        int64     `json:"user_id"`
+	MotorcycleId  int64     `json:"motorcycle_id"`
+	Price         float64   `json:"price"`
+	Days          int64     `json:"days"`
+	LocationDay   time.Time `json:"location_day"`
+	DevolutionDay time.Time `json:"devolution_day"`
+	Fine          float64   `json:"fine"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
+}
+
+type MotorcycleDTO struct {
+	Id        int64     `json:"id"`
+	Year      int64     `json:"year"`
+	Model     string    `json:"model"`
+	Plate     string    `json:"plate"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	IsLocated bool      `json:"is_located"`
+	Active    bool      `json:"active"`
+}
+
 type UserDTO struct {
 	Username       string    `json:"username"`
 	Password       string    `json:"password"`
@@ -105,5 +129,26 @@ func main() {
 		fmt.Println("Erro ao chamar o serviço:", err)
 	} else {
 		fmt.Println("Authenticate:", tokenString2)
+	}
+
+	var motorcycles []*MotorcycleDTO
+	if err = Call("12348", "MotorcycleService.GetAllActiveMotorcycles", struct{}{}, &motorcycles); err != nil {
+		fmt.Println("Erro ao chamar serviço:", err)
+	} else {
+		fmt.Println("morotcycles:")
+		for _, m := range motorcycles {
+			fmt.Printf("%+v\n", m)
+
+		}
+	}
+
+	var locations []*LocationDTO
+	if err = Call("12349", "LocationService.GetAllLocations", struct{}{}, &locations); err != nil {
+		fmt.Println("Erro ao chamar serviço:", err)
+	} else {
+		fmt.Println("locations:")
+		for _, l := range locations {
+			fmt.Printf("%+v\n", l)
+		}
 	}
 }
