@@ -3,7 +3,6 @@ package services
 import (
 	"github.com/rcarvalho-pb/mottu-authentication_service/internal/application/dtos"
 	rpc_client "github.com/rcarvalho-pb/mottu-authentication_service/internal/rpc/client"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type userService struct {
@@ -25,6 +24,10 @@ func (us *userService) getUser(username string) (*dtos.UserDTO, error) {
 	return userDto, nil
 }
 
-func (us *userService) validatePassword(hashedPassword, password string) error {
-	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+func (us *userService) validatePassword(passwords *dtos.ComparePasswordsDTO) error {
+	if err := rpc_client.Call(us.addr, "UserService.ComparePasswords", &passwords, &struct{}{}); err != nil {
+		return err
+	}
+
+	return nil
 }

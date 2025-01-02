@@ -4,6 +4,11 @@ import (
 	"time"
 )
 
+type ComparePasswordsDTO struct {
+	HashedPassword string
+	Password       string
+}
+
 type UserDTO struct {
 	Id             int64     `json:"id"`
 	Username       string    `json:"username"`

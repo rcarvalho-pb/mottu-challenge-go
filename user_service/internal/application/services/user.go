@@ -209,6 +209,14 @@ func validateNewUser(user dtos.UserDTO) error {
 	return nil
 }
 
+func (us *UserService) ComparePasswords(hashedPassword, password string) error {
+	return comparePasswords(hashedPassword, password)
+}
+
 func hashPassword(password string) ([]byte, error) {
 	return bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+}
+
+func comparePasswords(hashedPassword string, password string) error {
+	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }

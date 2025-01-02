@@ -17,7 +17,12 @@ func (s *Service) AuthenticateUser(request dtos.UserRequest) (string, error) {
 		return "", err
 	}
 
-	if err = s.validatePassword(user.Password, request.Password); err != nil {
+	passwords := &dtos.ComparePasswordsDTO{
+		HashedPassword: user.Password,
+		Password:       request.Password,
+	}
+
+	if err = s.validatePassword(passwords); err != nil {
 		return "", err
 	}
 

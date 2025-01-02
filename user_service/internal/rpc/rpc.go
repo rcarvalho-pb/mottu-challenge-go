@@ -115,6 +115,18 @@ func (r *RPCServer) ReactivateUser(userId int64, _ *struct{}) error {
 	return nil
 }
 
-func (r *RPCServer) UpdatePassord() error {
+func (r *RPCServer) ComparePasswords(passwords *dtos.ComparePasswordsDTO, _ *struct{}) error {
+	if err := r.userService.ComparePasswords(passwords.HashedPassword, passwords.Password); err != nil {
+		return fmt.Errorf("Passwords doesn't match")
+	}
+
+	return nil
+}
+
+func (r *RPCServer) UpdatePassord(user *dtos.UserDTO, _ *struct{}) error {
+	if err := r.userService.UpdateUser(user); err != nil {
+		return err
+	}
+
 	return nil
 }
