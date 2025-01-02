@@ -20,6 +20,16 @@ func NewUserService(Repository model.UserRepository) *UserService {
 	}
 }
 
+func (us *UserService) CreateUser(newUser *dtos.UserDTO) error {
+	user := model.UserFromDTO(newUser)
+
+	if err := us.UserRepository.CreateUser(user); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (us *UserService) GetAllUsers() ([]*dtos.UserDTO, error) {
 	users, err := us.UserRepository.GetAllUsers()
 	if err != nil {

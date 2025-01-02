@@ -14,6 +14,6 @@ type UserDTO struct {
 	CNPJ           string    `json:"cnpj"`
 	CNH            string    `json:"cnh"`
 	CNHType        string    `json:"cnh_type"`
-	CNHFilePath    string    `json:"cnh_file_path"`
+	CNHFile        []byte    `json:"cnh_file_path"`
 	ActiveLocation bool      `json:"active_location"`
 }

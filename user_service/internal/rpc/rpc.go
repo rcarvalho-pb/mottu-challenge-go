@@ -44,6 +44,18 @@ func (r *RPCServer) RPCListen() error {
 	}
 }
 
+func (r *RPCServer) CreateUser(newUser *dtos.UserDTO, _ *struct{}) error {
+	if newUser == nil {
+		return fmt.Errorf("user can't be null")
+	}
+
+	if err := r.userService.CreateUser(newUser); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *RPCServer) GetUserById(userId int64, reply *dtos.UserDTO) error {
 	user, err := r.userService.GetUserById(userId)
 	if err != nil {
