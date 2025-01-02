@@ -20,16 +20,6 @@ func NewUserService(Repository model.UserRepository) *UserService {
 	}
 }
 
-func (us *UserService) CreateUser(newUser *dtos.UserDTO) error {
-	user := model.UserFromDTO(newUser)
-
-	if err := us.UserRepository.CreateUser(user); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (us *UserService) GetAllUsers() ([]*dtos.UserDTO, error) {
 	users, err := us.UserRepository.GetAllUsers()
 	if err != nil {
@@ -76,7 +66,7 @@ func (us *UserService) GetUserByUsername(username string) (*dtos.UserDTO, error)
 	return user.ToDTO(), nil
 }
 
-func (us *UserService) NewUser(newUser *dtos.UserDTO) error {
+func (us *UserService) CreateUser(newUser *dtos.UserDTO) error {
 	if err := validateNewUser(*newUser); err != nil {
 		return err
 	}
@@ -101,51 +91,51 @@ func (us *UserService) NewUser(newUser *dtos.UserDTO) error {
 	return nil
 }
 
-func (us *UserService) UpdateUser(userId int64, newUser *dtos.UserDTO) error {
-	user, err := us.UserRepository.GetUserById(userId)
+func (us *UserService) UpdateUser(user *dtos.UserDTO) error {
+	u, err := us.UserRepository.GetUserById(user.Id)
 	if err != nil {
 		return err
 	}
 
-	if err = parameterizaNewUser(newUser); err != nil {
+	if err = parameterizaNewUser(user); err != nil {
 		return err
 	}
 
-	if newUser.Name != "" {
-		user.Name = newUser.Name
+	if user.Name != "" {
+		u.Name = user.Name
 	}
 
-	if newUser.Username != "" {
-		user.Username = newUser.Username
+	if user.Username != "" {
+		u.Username = user.Username
 	}
 
-	if !newUser.BirthDate.IsZero() {
-		user.BirthDate = newUser.BirthDate
+	if !user.BirthDate.IsZero() {
+		u.BirthDate = user.BirthDate
 	}
 
-	if newUser.CNPJ != "" {
-		user.CNPJ = newUser.CNPJ
+	if user.CNPJ != "" {
+		u.CNPJ = user.CNPJ
 	}
 
-	if newUser.CNH != "" {
-		user.CNH = newUser.CNH
+	if user.CNH != "" {
+		u.CNH = user.CNH
 	}
 
-	if newUser.CNHType != "" {
-		user.CNHType = newUser.CNHType
+	if user.CNHType != "" {
+		u.CNHType = user.CNHType
 	}
 
 	// if newUser.CNHFilePath != "" {
 	// 	user.CNHFilePath = newUser.CNHFilePath
 	// }
 
-	if user.ActiveLocation != newUser.ActiveLocation {
-		user.ActiveLocation = newUser.ActiveLocation
+	if u.ActiveLocation != user.ActiveLocation {
+		u.ActiveLocation = user.ActiveLocation
 	}
 
-	user.UpdatedAt = time.Now()
+	u.UpdatedAt = time.Now()
 
-	if err = us.UserRepository.UpdateUser(user); err != nil {
+	if err = us.UserRepository.UpdateUser(u); err != nil {
 		return err
 	}
 

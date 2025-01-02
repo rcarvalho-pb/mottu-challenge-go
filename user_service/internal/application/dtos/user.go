@@ -17,3 +17,9 @@ type UserDTO struct {
 	CNHFile        []byte    `json:"cnh_file_path"`
 	ActiveLocation bool      `json:"active_location"`
 }
+
+type NewUserPasswordDTO struct {
+	Id          int64  `json:"id"`
+	OldPassword string `json:"old_password"`
+	NewPassword string `json:"new_password"`
+}

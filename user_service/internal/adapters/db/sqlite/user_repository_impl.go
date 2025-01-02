@@ -217,5 +217,16 @@ func (db *DB) CreateUser(user *model.User) error {
 }
 
 func (db *DB) UpdateUser(user *model.User) error {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	stmt := `UPDATE tb_users
+	SET username = :username, password = :password, name = :name, birth_date = :birth_date, cnpj = :cnpj, cnh = :cnh, cnh_type = :cnh_type, cnh_file_path = :cnh_file_path
+	WHERE id = :id`
+
+	if _, err := db.DB.NamedExecContext(ctx, stmt, &user); err != nil {
+		return err
+	}
+
 	return nil
 }

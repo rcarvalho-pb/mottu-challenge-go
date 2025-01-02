@@ -56,8 +56,8 @@ func (r *RPCServer) CreateUser(newUser *dtos.UserDTO, _ *struct{}) error {
 	return nil
 }
 
-func (r *RPCServer) GetUserById(userId int64, reply *dtos.UserDTO) error {
-	user, err := r.userService.GetUserById(userId)
+func (r *RPCServer) GetUserById(userId *int64, reply *dtos.UserDTO) error {
+	user, err := r.userService.GetUserById(*userId)
 	if err != nil {
 		return fmt.Errorf("error getting user by id: %s\n", err)
 	}
@@ -67,8 +67,8 @@ func (r *RPCServer) GetUserById(userId int64, reply *dtos.UserDTO) error {
 	return err
 }
 
-func (r *RPCServer) GetUserByUsername(username string, reply *dtos.UserDTO) error {
-	user, err := r.userService.GetUserByUsername(username)
+func (r *RPCServer) GetUserByUsername(username *string, reply *dtos.UserDTO) error {
+	user, err := r.userService.GetUserByUsername(*username)
 	if err != nil {
 		return fmt.Errorf("error getting user by username: %s\n", err)
 	}
@@ -97,8 +97,8 @@ func (r *RPCServer) GetAllUsers(_ struct{}, reply *[]*dtos.UserDTO) error {
 	return err
 }
 
-func (r *RPCServer) DeactivateUser(userId int64, reply *bool) error {
-	if err := r.userService.DeactivateUserById(userId); err != nil {
+func (r *RPCServer) DeactivateUser(userId *int64, reply *bool) error {
+	if err := r.userService.DeactivateUserById(*userId); err != nil {
 		return fmt.Errorf("error deactivating user [%d]: %s\n", userId, err)
 	}
 
@@ -107,12 +107,10 @@ func (r *RPCServer) DeactivateUser(userId int64, reply *bool) error {
 	return nil
 }
 
-func (r *RPCServer) ReactivateUser(userId int64, reply *bool) error {
+func (r *RPCServer) ReactivateUser(userId int64, _ *struct{}) error {
 	if err := r.userService.ReactivateUserById(userId); err != nil {
 		return fmt.Errorf("error reactivating user [%d]: %s\n", userId, err)
 	}
-
-	*reply = true
 
 	return nil
 }
