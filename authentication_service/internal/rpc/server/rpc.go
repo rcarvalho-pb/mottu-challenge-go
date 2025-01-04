@@ -44,8 +44,8 @@ func (r *RPCServer) RPCListen() error {
 	}
 }
 
-func (r *RPCServer) Authenticate(dto dtos.UserDTO, reply *string) error {
-	tokenString, err := r.Service.GetToken(&dto)
+func (r *RPCServer) Authenticate(dto *dtos.UserDTO, reply *string) error {
+	tokenString, err := r.Service.GetToken(dto)
 	if err != nil {
 		return err
 	}

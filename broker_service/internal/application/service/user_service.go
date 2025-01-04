@@ -8,9 +8,13 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type UserService struct{}
+type userService struct{}
 
-func (us *UserService) CreateUser(newUser *model.UserDTO) error {
+func newUserService() *userService {
+	return &userService{}
+}
+
+func (us *userService) createUser(newUser *model.UserDTO) error {
 	if newUser == nil {
 		return fmt.Errorf("user can't be null")
 	}
@@ -22,7 +26,7 @@ func (us *UserService) CreateUser(newUser *model.UserDTO) error {
 	return nil
 }
 
-func (us *UserService) UpdateUser(user *model.UserDTO) error {
+func (us *userService) updateUser(user *model.UserDTO) error {
 	if user == nil {
 		return fmt.Errorf("user can't be null")
 	}
@@ -34,7 +38,7 @@ func (us *UserService) UpdateUser(user *model.UserDTO) error {
 	return nil
 }
 
-func (us *UserService) GetAllUsers() ([]*model.UserDTO, error) {
+func (us *userService) getAllUsers() ([]*model.UserDTO, error) {
 	var users []*model.UserDTO
 
 	if err := rpc_client.Call(addrs.UserAddr, "UserService.GetAllUsers", &users, &struct{}{}); err != nil {
@@ -44,7 +48,7 @@ func (us *UserService) GetAllUsers() ([]*model.UserDTO, error) {
 	return users, nil
 }
 
-func (us *UserService) GetAllActiveUsers() ([]*model.UserDTO, error) {
+func (us *userService) getAllActiveUsers() ([]*model.UserDTO, error) {
 	var users []*model.UserDTO
 
 	if err := rpc_client.Call(addrs.UserAddr, "UserService.GetAllActiveUsers", &users, &struct{}{}); err != nil {
@@ -54,7 +58,7 @@ func (us *UserService) GetAllActiveUsers() ([]*model.UserDTO, error) {
 	return users, nil
 }
 
-func (us *UserService) GetUserById(userId int64) (*model.UserDTO, error) {
+func (us *userService) getUserById(userId int64) (*model.UserDTO, error) {
 	var user *model.UserDTO
 
 	if err := rpc_client.Call(addrs.UserAddr, "UserService.GetUserById", &user, &userId); err != nil {
@@ -64,7 +68,7 @@ func (us *UserService) GetUserById(userId int64) (*model.UserDTO, error) {
 	return user, nil
 }
 
-func (us *UserService) GetUserByUsername(username string) (*model.UserDTO, error) {
+func (us *userService) getUserByUsername(username string) (*model.UserDTO, error) {
 	var user *model.UserDTO
 
 	if err := rpc_client.Call(addrs.UserAddr, "UserService.GetUserByUsername", &username, &user); err != nil {
@@ -74,7 +78,7 @@ func (us *UserService) GetUserByUsername(username string) (*model.UserDTO, error
 	return user, nil
 }
 
-func (us *UserService) DeactivateUser(userId int64) error {
+func (us *userService) deactivateUser(userId int64) error {
 	if err := rpc_client.Call(addrs.UserAddr, "UserService.DeactivateUser", &userId, &struct{}{}); err != nil {
 		return err
 	}
@@ -82,7 +86,7 @@ func (us *UserService) DeactivateUser(userId int64) error {
 	return nil
 }
 
-func (us *UserService) ReactivateUser(userId int64) error {
+func (us *userService) reactivateUser(userId int64) error {
 	if err := rpc_client.Call(addrs.UserAddr, "UserService.ReactivateUser", &userId, &struct{}{}); err != nil {
 		return err
 	}
@@ -90,19 +94,14 @@ func (us *UserService) ReactivateUser(userId int64) error {
 	return nil
 }
 
-func (us *UserService) UpdatePassword(newUserPassword *model.NewUserPasswordDTO) error {
-	user, err := us.GetUserById(newUserPassword.Id)
-	if err != nil {
+func (us *userService) updatePassword(user *model.UserDTO, newPassword string) error {
+	if err := validatePassword(user.Password, newPassword); err != nil {
 		return err
 	}
 
-	if err = validatePassword(user.Password, newUserPassword.OldPassword); err != nil {
-		return err
-	}
+	user.Password = newPassword
 
-	user.Password = newUserPassword.NewPassword
-
-	if err = rpc_client.Call(addrs.UserAddr, "UserService.UpdateUser", &user, &struct{}{}); err != nil {
+	if err := rpc_client.Call(addrs.UserAddr, "UserService.UpdateUser", &user, &struct{}{}); err != nil {
 		return err
 	}
 
