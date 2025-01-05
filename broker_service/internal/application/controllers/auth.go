@@ -1,30 +1,28 @@
 package controllers
 
 import (
-	"encoding/json"
-	"io"
 	"net/http"
 
 	"github.com/rcarvalho-pb/mottu-broker_service/internal/application/dtos"
+	"github.com/rcarvalho-pb/mottu-broker_service/internal/helper"
 )
 
-func Authenticate(w http.ResponseWriter, r *http.Request) {
-	requestBody, err := io.ReadAll(r.Body)
-	defer r.Body.Close()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+type authController struct{}
+
+func newAuthController() *authController {
+	return &authController{}
+}
+
+func (ac *authController) Authenticate(w http.ResponseWriter, r *http.Request) {
 	var authRequest *dtos.AuthRequest
-	if err = json.Unmarshal(requestBody, authRequest); err != nil {
-		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+	if err := helper.ReadJson(w, r, &authRequest); err != nil {
+		helper.ErrorJson(w, err, http.StatusBadRequest)
 		return
 	}
-	tokenString, err := srv.Authenticate(authRequest)
+	tokenString, err := srv.AuthSvc.Authenticate(authRequest)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		helper.ErrorJson(w, err, http.StatusUnprocessableEntity)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusAccepted)
+	helper.WriteJson(w, http.StatusAccepted, tokenString)
 }

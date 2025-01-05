@@ -11,7 +11,7 @@ func newAuthService() *authService {
 	return &authService{}
 }
 
-func (as *authService) authenticate(authRequest *dtos.AuthRequest) (tokenString *string, err error) {
+func (as *authService) Authenticate(authRequest *dtos.AuthRequest) (tokenString *string, err error) {
 	rpc_client.Call(addrs.AuthAddr, "AuthService.Authenticate", &authRequest, &tokenString)
 	return tokenString, err
 }
