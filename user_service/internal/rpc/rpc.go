@@ -123,7 +123,15 @@ func (r *RPCServer) ComparePasswords(passwords *dtos.ComparePasswordsDTO, _ *str
 	return nil
 }
 
-func (r *RPCServer) UpdatePassord(user *dtos.UserDTO, _ *struct{}) error {
+func (r *RPCServer) UpdatePassord(newPassword *dtos.NewUserPasswordDTO, _ *struct{}) error {
+	user, err := r.userService.GetUserById(newPassword.Id)
+	if err != nil {
+		return err
+	}
+	if err := r.userService.ComparePasswords(newPassword.NewPassword, user.Password); err != nil {
+		return err
+	}
+	user.Password = newPassword.NewPassword
 	if err := r.userService.UpdateUser(user); err != nil {
 		return err
 	}

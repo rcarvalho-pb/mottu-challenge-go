@@ -12,5 +12,6 @@ var AuthRoutes = []*Route{
 		Method:         http.MethodPost,
 		Function:       controller.AuthController.Authenticate,
 		Authentication: false,
+		Admin:          false,
 	},
 }

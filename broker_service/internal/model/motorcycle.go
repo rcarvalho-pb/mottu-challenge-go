@@ -12,9 +12,3 @@ type MotorcycleDTO struct {
 	IsLocated bool      `json:"is_located"`
 	Active    bool      `json:"active"`
 }
-
-type NewMotorcycleRequest struct {
-	Year  int64  `json:"year"`
-	Model string `json:"model"`
-	Plate string `json:"plate"`
-}

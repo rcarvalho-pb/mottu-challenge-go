@@ -80,12 +80,8 @@ func (us *userService) ReactivateUser(userId int64) error {
 	return nil
 }
 
-func (us *userService) UpdatePassword(user *model.UserDTO, newPassword string) error {
-	if err := validatePassword(user.Password, newPassword); err != nil {
-		return err
-	}
-	user.Password = newPassword
-	if err := rpc_client.Call(addrs.UserAddr, "UserService.UpdateUser", &user, &struct{}{}); err != nil {
+func (us *userService) UpdatePassword(userPassword *model.NewUserPasswordDTO) error {
+	if err := rpc_client.Call(addrs.UserAddr, "UserService.UpdateUser", &userPassword, &struct{}{}); err != nil {
 		return err
 	}
 	return nil

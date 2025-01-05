@@ -82,6 +82,41 @@ func (uc *userController) GetUserByUsername(w http.ResponseWriter, r *http.Reque
 	helper.WriteJson(w, http.StatusOK, user)
 }
 
-func (uc *userController) DeleteUserById(w http.ResponseWriter, r *http.Request) {
+func (uc *userController) DeactivateUserById(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil {
+		helper.ErrorJson(w, err)
+		return
+	}
+	if err = srv.UserSvc.DeactivateUser(int64(id)); err != nil {
+		helper.ErrorJson(w, err)
+		return
+	}
+	helper.WriteJson(w, http.StatusAccepted, nil)
+}
 
+func (uc *userController) ReactivateUser(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil {
+		helper.ErrorJson(w, err)
+		return
+	}
+	if err = srv.UserSvc.ReactivateUser(int64(id)); err != nil {
+		helper.ErrorJson(w, err)
+		return
+	}
+	helper.WriteJson(w, http.StatusAccepted, nil)
+}
+
+func (uc *userController) UpdatePassowrd(w http.ResponseWriter, r *http.Request) {
+	var newUserPassword *model.NewUserPasswordDTO
+	if err := helper.ReadJson(w, r, &newUserPassword); err != nil {
+		helper.ErrorJson(w, err)
+		return
+	}
+	if err := srv.UserSvc.UpdatePassword(newUserPassword); err != nil {
+		helper.ErrorJson(w, err)
+		return
+	}
+	helper.WriteJson(w, http.StatusOK, nil)
 }

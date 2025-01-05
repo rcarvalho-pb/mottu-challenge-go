@@ -57,7 +57,7 @@ func (ms *motorcycleService) GetMotorcycleById(motorcycleId int64) (*model.Motor
 	return motorcycle, nil
 }
 
-func (ms *motorcycleService) GetMotorcycleByYear(motorcycleId int64) ([]*model.MotorcycleDTO, error) {
+func (ms *motorcycleService) GetMotorcyclesByYear(motorcycleId int64) ([]*model.MotorcycleDTO, error) {
 	var motorcycles []*model.MotorcycleDTO
 	if err := rpc_client.Call(addrs.MotorcycleAddr, "MotorcycleService.GetAllMotorcycleByYear", &motorcycleId, &motorcycles); err != nil {
 		return nil, err
@@ -65,9 +65,9 @@ func (ms *motorcycleService) GetMotorcycleByYear(motorcycleId int64) ([]*model.M
 	return motorcycles, nil
 }
 
-func (ms *motorcycleService) GetMotorcycleByModel(motorcycleId int64) ([]*model.MotorcycleDTO, error) {
+func (ms *motorcycleService) GetMotorcyclesByModel(motorcycleModel string) ([]*model.MotorcycleDTO, error) {
 	var motorcycles []*model.MotorcycleDTO
-	if err := rpc_client.Call(addrs.MotorcycleAddr, "MotorcycleService.GetAllMotorcycleByModel", &motorcycleId, &motorcycles); err != nil {
+	if err := rpc_client.Call(addrs.MotorcycleAddr, "MotorcycleService.GetAllMotorcycleByModel", &motorcycleModel, &motorcycles); err != nil {
 		return nil, err
 	}
 	return motorcycles, nil

@@ -16,6 +16,7 @@ type Route struct {
 	Method         string
 	Function       func(http.ResponseWriter, *http.Request)
 	Authentication bool
+	Admin          bool
 }
 
 func StartMux(mux *http.ServeMux) *http.ServeMux {
