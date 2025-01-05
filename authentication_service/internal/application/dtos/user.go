@@ -6,6 +6,7 @@ type UserDTO struct {
 	Id             int64     `json:"id"`
 	Username       string    `json:"username"`
 	Password       string    `json:"password"`
+	Role           string    `json:"role"`
 	Name           string    `json:"name"`
 	BirthDate      time.Time `json:"birth_date"`
 	CNPJ           string    `json:"cnpj"`
@@ -15,7 +16,7 @@ type UserDTO struct {
 	ActiveLocation bool      `json:"active_location"`
 }
 
-type UserRequest struct {
+type AuthRequest struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }

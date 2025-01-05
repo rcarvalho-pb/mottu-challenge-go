@@ -24,10 +24,6 @@ func New(addrPool *config.Adresses) *BrokerService {
 	}
 }
 
-func (bs *BrokerService) Authenticate(authRequest *dtos.AuthRequest) (*string, error){
-	user, err := bs.userSvc.getUserByUsername(authRequest.Username)
-	if err != nil {
-		return nil, err
-	}
-	bs.userSvc.
+func (bs *BrokerService) Authenticate(authRequest *dtos.AuthRequest) (*string, error) {
+	return bs.authSvc.authenticate(authRequest)
 }

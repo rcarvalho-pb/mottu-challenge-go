@@ -4,6 +4,7 @@ import (
 	"github.com/rcarvalho-pb/mottu-location_service/internal/adapters/db/sqlite"
 	"github.com/rcarvalho-pb/mottu-location_service/internal/application/dtos"
 	"github.com/rcarvalho-pb/mottu-location_service/internal/model"
+	rpc_client "github.com/rcarvalho-pb/mottu-location_service/internal/rpc/client"
 )
 
 type LocationService struct {
@@ -16,7 +17,11 @@ func New(db *sqlite.DB) *LocationService {
 	}
 }
 
-func (ls *LocationService) CreateLocation(dto *dtos.NewLocationDTO) error {
+func (ls *LocationService) CreateLocation(dto *dtos.NewLocationDTO) (err error) {
+	var user *dtos.UserDTO
+	if err = rpc_client.Call("", "UserService.GetUserById", &dto.UserId, &user); err != nil {
+		return
+	}
 	newLocation := &model.Location{
 		UserId:        dto.UserId,
 		MotorcycleId:  dto.MotorcycleId,

@@ -2,10 +2,28 @@ package model
 
 import (
 	"database/sql"
+	"slices"
 	"time"
 
 	"github.com/rcarvalho-pb/mottu-user_service/internal/application/dtos"
 )
+
+var ROLES = []string{"admin", "common"}
+
+type Role int
+
+const (
+	Admin Role = iota
+	Common
+)
+
+func (r Role) String() string {
+	return ROLES[r]
+}
+
+func RoleToCod(role string) Role {
+	return Role(slices.Index(ROLES, role))
+}
 
 type UserRepository interface {
 	GetAllUsers() ([]*User, error)
@@ -20,7 +38,7 @@ type User struct {
 	Id             int64          `json:"id" db:"id"`
 	Username       string         `json:"username" db:"username"`
 	Password       string         `json:"password" db:"password"`
-	Role           int            `json:"role" db:"role"`
+	Role           Role           `json:"role" db:"role"`
 	Name           string         `json:"name" db:"name"`
 	BirthDate      time.Time      `json:"birth_date" db:"birth_date"`
 	CNPJ           string         `json:"cnpj" db:"cnpj"`
@@ -42,6 +60,7 @@ func UserFromDTO(dto *dtos.UserDTO) *User {
 		Id:        dto.Id,
 		Username:  dto.Username,
 		Password:  dto.Password,
+		Role:      RoleToCod(dto.Role),
 		Name:      dto.Username,
 		BirthDate: dto.BirthDate,
 		CNPJ:      dto.CNPJ,
@@ -60,6 +79,7 @@ func (u *User) ToDTO() *dtos.UserDTO {
 		Id:             u.Id,
 		Username:       u.Username,
 		Password:       u.Password,
+		Role:           u.Role.String(),
 		Name:           u.Name,
 		BirthDate:      u.BirthDate,
 		CNPJ:           u.CNPJ,

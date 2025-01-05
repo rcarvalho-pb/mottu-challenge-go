@@ -11,7 +11,7 @@ func New(userServiceAddr, tokenServiceAddr string) *Service {
 	return &Service{newUserService(userServiceAddr), newTokenService(tokenServiceAddr)}
 }
 
-func (s *Service) AuthenticateUser(request dtos.UserRequest) (string, error) {
+func (s *Service) AuthenticateUser(request *dtos.AuthRequest) (string, error) {
 	user, err := s.getUser(request.Username)
 	if err != nil {
 		return "", err
@@ -26,7 +26,7 @@ func (s *Service) AuthenticateUser(request dtos.UserRequest) (string, error) {
 		return "", err
 	}
 
-	tokenString, err := s.GetToken(user)
+	tokenString, err := s.getToken(user)
 	if err != nil {
 		return "", err
 	}

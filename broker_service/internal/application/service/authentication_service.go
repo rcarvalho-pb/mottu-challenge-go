@@ -1,9 +1,7 @@
 package service
 
 import (
-	"fmt"
-
-	"github.com/rcarvalho-pb/mottu-broker_service/internal/model"
+	"github.com/rcarvalho-pb/mottu-broker_service/internal/application/dtos"
 	rpc_client "github.com/rcarvalho-pb/mottu-broker_service/internal/rpc/client"
 )
 
@@ -13,14 +11,7 @@ func newAuthService() *authService {
 	return &authService{}
 }
 
-func (as *authService) authenticate(user *model.UserDTO) (*string, error) {
-	var (
-		tokenString *string
-		err         error
-	)
-	if user == nil {
-		return nil, fmt.Errorf("user can't be null")
-	}
-	rpc_client.Call(addrs.AuthAddr, "AuthService.Authenticate", &user, &tokenString)
+func (as *authService) authenticate(authRequest *dtos.AuthRequest) (tokenString *string, err error) {
+	rpc_client.Call(addrs.AuthAddr, "AuthService.Authenticate", &authRequest, &tokenString)
 	return tokenString, err
 }

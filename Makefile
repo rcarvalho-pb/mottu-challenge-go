@@ -38,7 +38,7 @@ user-service:
 location-service:
 	@echo "Starting location service"
 	@cd ./location_service/ && go build -o app/${LOCATION_SERVICE_BINARY} ./cmd/api
-	@cd ./location_service/ && export DB_LOCATION=${DB_LOCATION} LOCATION_SERVICE_ADDRESS=${LOCATION_SERVICE_ADDRESS} && app/${LOCATION_SERVICE_BINARY} &
+	@cd ./location_service/ && export DB_LOCATION=${DB_LOCATION} LOCATION_SERVICE_ADDRESS=${LOCATION_SERVICE_ADDRESS} USER_SERVICE_ADDRESS=${USER_SERVICE_ADDRESS} MOTORCYCLE_SERVICE_ADDRESS=${MOTORCYCLE_SERVICE_ADDRESS} && app/${LOCATION_SERVICE_BINARY} &
 	@echo "User location started on port ${LOCATION_SERVICE_ADDRESS}"
 
 token-service:
