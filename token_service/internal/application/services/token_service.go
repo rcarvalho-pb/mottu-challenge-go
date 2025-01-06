@@ -29,33 +29,29 @@ func (t *TokenService) GenerateJWT(user *dtos.UserDTO) (string, error) {
 			Issuer:    "mottu-app",
 		},
 	}
-
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(jwtSecret)
 	if err != nil {
 		return "", nil
 	}
-
 	return tokenString, nil
 }
 
 func (t *TokenService) GetClaims(tokenString string) (*dtos.Claims, error) {
 	claims := &dtos.Claims{}
-
-	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (any, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("invalid signature method")
-		}
-
-		return jwtSecret, nil
-	})
+	token, err := jwt.ParseWithClaims(tokenString, claims, getValidationKey)
 	if err != nil {
 		return nil, err
 	}
-
 	if !token.Valid {
 		return nil, fmt.Errorf("invalid token")
 	}
-
 	return claims, nil
+}
+
+func getValidationKey(token *jwt.Token) (any, error) {
+	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+		return nil, fmt.Errorf("invalid signature method")
+	}
+	return jwtSecret, nil
 }
